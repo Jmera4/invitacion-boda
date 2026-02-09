@@ -82,7 +82,7 @@ async function cargarInvitado() {
         `Bienvenido ${data.nombre_familia}`;
 
     guestPasses.innerText =
-        `Hemos reservado ${data.pases} lugares para ustedes`;
+        `Hemos reservado ${data.pases} lugar/es para usted/es`;
 
     if (confirmedInput) confirmedInput.max = data.pases;
 
@@ -283,4 +283,5 @@ if (slides.length > 0) {
     showSlide(index);
     startAutoSlide();
 }
+
 
