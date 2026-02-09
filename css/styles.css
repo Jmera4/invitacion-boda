@@ -440,14 +440,4 @@ button.confirmed:hover {
     }
 
 }
-@media (max-width: 80vw) {
-    
-}
-.browser-warning {
-    display: none;
-    background: var(--olive);
-    color: white;
-    text-align: center;
-    padding: 10px;
-    font-size: 14px;
-}
+
