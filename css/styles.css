@@ -1,0 +1,441 @@
+/* =========================
+   VARIABLES
+========================= */
+:root {
+    --white: #FFFFFF;
+    --gold: #C6A769;
+    --olive: #697522;
+    --text: #2B2B2B;
+}
+
+
+/* =========================
+   RESET & BASE
+========================= */
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--white);
+    color: var(--text);
+}
+
+section {
+    padding: 90px 20px;
+    text-align: center;
+}
+
+section:nth-child(even) {
+    background: #FAFAF7;
+}
+
+
+/* =========================
+   TIPOGRAFÍA
+========================= */
+h1, h2 {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 1px;
+    color: var(--olive);
+}
+
+p, span, select, input, textarea {
+    font-family: 'Montserrat', sans-serif;
+}
+
+p {
+    line-height: 1.7;
+    max-width: 600px;
+    margin: auto;
+}
+
+.we_doit {
+    font-size: 4em;
+    margin-bottom: 10px;
+}
+
+.overlay span {
+    font-size: 2em;
+    color: var(--olive);
+}
+
+.fecha h2,
+.evento h2 {
+    color: var(--gold);
+}
+
+
+/* =========================
+   HERO
+========================= */
+.hero {
+    position: relative;
+    height: 65vh;
+    background: url('../images/portada.webp') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    transition: background 0.5s ease;
+    pointer-events: none;
+}
+.hero.scrolled::after {
+    background: rgba(0,0,0,0.10);
+}
+
+.overlay {
+    color: var(--olive);
+}
+
+
+/* =========================
+   DIVISORES Y DETALLES
+========================= */
+.section-divider {
+    width: 150px;
+    height: 2px;
+    background: var(--gold);
+    margin: 20px auto;
+}
+
+.divider {
+    width: 75vw;
+    height: 2px;
+    background: var(--gold);
+    margin: 15px auto 30px auto;
+}
+
+
+/* =========================
+   MENSAJE
+========================= */
+.mensaje {
+    background:
+        radial-gradient(circle at top right,
+        rgba(198,167,105,0.08),
+        transparent 60%);
+    font-size: 18px;
+}
+
+
+/* =========================
+   GALERÍA
+========================= */
+.grid-galeria {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 900px;
+    margin: auto;
+}
+
+.grid-galeria img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 12px;
+    transition: transform 0.4s ease;
+}
+
+.grid-galeria img:hover {
+    transform: scale(1.03);
+}
+
+
+/* =========================
+   BOTONES
+========================= */
+button {
+    background: var(--gold);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: var(--olive);
+}
+
+
+/* =========================
+   MAPA
+========================= */
+.mapa {
+    max-width: 600px;
+    margin: 20px auto 0 auto;
+}
+
+.mapa iframe {
+    width: 100%;
+    height: 500px;
+    border: 0;
+    border-radius: 12px;
+}
+
+
+
+/* =========================
+   ANIMACIONES
+========================= */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* =========================
+   HERO INTRO ANIMATION
+========================= */
+
+.hero-content {
+    opacity: 0;
+    transform: translateY(25px);
+}
+
+.hero-content.show {
+    animation: heroFade 1.9s ease forwards;
+}
+
+@keyframes heroFade {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   RSVP
+========================= */
+.rsvp {
+    max-width: 600px;
+    margin: auto;
+}
+select,
+input,
+textarea {
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.15);
+    background: white;
+    font-size: 1rem;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+select:focus,
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(198,167,105,0.15);
+}
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+.rsvp button {
+    margin-top: 25px;
+    width: 100%;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+#guest-name {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    color: var(--olive);
+}
+
+#guest-passes {
+    margin-bottom: 20px;
+    color: #666;
+}
+.input-label {
+    display: block;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+}
+.confirmation-message {
+    margin-top: 20px;
+    color: var(--olive);
+    font-size: 1rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease;
+}
+
+.confirmation-message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.hidden {
+    display: none;
+}
+button.confirmed {
+    background: var(--olive);
+    cursor: default;
+    transform: none;
+    opacity: 0.9;
+}
+button.confirmed:hover {
+    background: var(--olive);
+}
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.modal.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transform: translateY(10px);
+    transition: transform 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    color: var(--text);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: var(--gold);
+    color: white;
+    border-radius: 25px;
+    padding: 10px 20px;
+}
+
+.btn-primary:hover {
+    background: var(--olive);
+}
+
+.btn-secondary {
+    background: #eee;
+    color: #555;
+    border-radius: 25px;
+    padding: 10px 20px;
+}
+.carousel {
+    position: relative;
+    max-width: 85vw;
+    margin: auto;
+    height: 560px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.carousel-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-item {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+
+    object-position: center;
+
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.carousel-item.active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.8);
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.carousel-btn:hover {
+    background: var(--gold);
+    color: white;
+}
+
+.carousel-btn.prev {
+    left: 10px;
+}
+
+.carousel-btn.next {
+    right: 10px;
+}
+
+
+
+
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (min-width: 768px) {
+
+    .grid-galeria {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+@media (max-width: 80vw) {
+    
+}

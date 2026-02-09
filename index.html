@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akari & Isai</title>
+    <meta property="og:title" content="Akari & Isai | Nuestra Boda">
+    <meta property="og:description" content="Nos encantaría compartir este día tan especial contigo. Confirma tu asistencia.">
+    <meta property="og:image" content="https://tudominio.com/images/portada.webp">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tudominio.com">
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- HERO -->
+<section class="hero">
+    
+</section>
+
+<!-- FECHA -->
+<section class="fecha fade-in">
+    <div class="overlay hero-content">
+        <h1 class="we_doit">¡Nos casamos!</h1>
+        <span>18 de Julio 2026</span>
+        <div class="contador">
+            <p>Faltan</p>
+            <p id="countdown"></p>
+        </div>
+    </div>
+</section>
+
+<!-- MENSAJE -->
+<section class="mensaje fade-in">
+    <p>
+        Con mucha alegría queremos compartir este momento tan especial contigo.
+    </p>
+</section>
+
+
+<!-- GALERIA -->
+<section class="galeria fade-in">
+    <h2>Nuestros momentos</h2>
+    <div class="divider"></div>
+
+    <div class="carousel active">
+    <button class="carousel-btn prev">&#10094;</button>
+
+    <div class="carousel-track">
+        <img src="images/foto1.png" class="carousel-item" loading="lazy">
+        <img src="images/foto2.png" class="carousel-item" loading="lazy">
+        <img src="images/foto3.png" class="carousel-item" loading="lazy">
+        <img src="images/foto4.png" class="carousel-item" loading="lazy">
+    </div>
+
+    <button class="carousel-btn next">&#10095;</button>
+</div>
+
+</section>
+
+
+
+<!-- EVENTO -->
+
+<section class="evento fade-in">
+    <h2>Recepción</h2>
+    <div class="divider"></div>
+    <p>Salón Los Olivos</p>
+    <p>6:00 PM</p>
+
+    <div class="mapa">
+        <iframe
+            src="https://www.google.com/maps?q=Zacatecas&output=embed"
+            loading="lazy">
+        </iframe>
+    </div>
+</section>
+
+
+
+<!-- RSVP -->
+<section class="rsvp fade-in">
+    <h2>Confirmar asistencia</h2>
+
+    <p id="guest-name"></p>
+    <p id="guest-passes"></p>
+
+    <select id="attendance">
+        <option value="">Selecciona una opción</option>
+        <option value="si">Sí asistiremos</option>
+        <option value="no">No podremos asistir</option>
+    </select>
+    <div id="guest-count-container" class="hidden">
+        <label for="confirmed-count" class="input-label">
+            Número de personas que asistirán
+        </label>
+
+        <input type="number" id="confirmed-count" min="0">
+    </div>
+
+    <textarea id="message" placeholder="Mensaje para los novios"></textarea>
+
+    <button id="confirm-btn">Confirmar</button>
+    <p id="confirmation-message" class="confirmation-message"></p>
+
+</section>
+<div id="confirm-modal" class="modal">
+    <div class="modal-content">
+        <p>¿Deseas confirmar tu asistencia?</p>
+
+        <div class="modal-buttons">
+            <button id="cancel-confirm" class="btn-secondary">Cancelar</button>
+            <button id="accept-confirm" class="btn-primary">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
