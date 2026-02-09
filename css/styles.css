@@ -420,7 +420,11 @@ button.confirmed:hover {
 .carousel-btn.next {
     right: 10px;
 }
-
+@media (max-width: 768px) {
+    .carousel {
+        height: 300px;
+    }
+}
 
 
 
@@ -438,4 +442,5 @@ button.confirmed:hover {
 }
 @media (max-width: 80vw) {
     
+
 }
