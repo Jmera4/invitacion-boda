@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Confirmaciones</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        .admin-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
+            color: var(--olive);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <h2>Confirmaciones</h2>
+
+    <div class="card">
+        <p>Total invitados: <span id="total"></span></p>
+        <p>Confirmados: <span id="confirmados"></span></p>
+        <p>Total asistentes: <span id="asistentes"></span></p>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Familia</th>
+                    <th>Pases</th>
+                    <th>Confirmados</th>
+                    <th>Asistencia</th>
+                    <th>Mensaje</th>
+                </tr>
+            </thead>
+            <tbody id="tabla"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/admin.js"></script>
+
+</body>
+</html>
