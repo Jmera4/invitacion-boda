@@ -8,7 +8,7 @@ const db = window.supabase.createClient(
     supabaseKey
 );
 /* =====================
-   VARIABLES
+VARIABLES
 ===================== */
 
 const weddingDate = new Date("Jul 18, 2026 18:00:00").getTime();
@@ -17,9 +17,8 @@ const guestId = params.get("id");
 
 const hero = document.querySelector(".hero");
 
-
 /* =====================
-   COUNTDOWN
+COUNTDOWN
 ===================== */
 
 function updateCountdown() {
@@ -37,7 +36,7 @@ setInterval(updateCountdown, 1000);
 
 
 /* =====================
-   SCROLL ANIMATION
+SCROLL ANIMATION
 ===================== */
 
 const elements = document.querySelectorAll(".fade-in");
@@ -54,7 +53,7 @@ elements.forEach(el => observer.observe(el));
 
 
 /* =====================
-   CARGAR INVITADO
+CARGAR INVITADO
 ===================== */
 
 async function cargarInvitado() {
@@ -78,15 +77,11 @@ async function cargarInvitado() {
         return;
     }
 
-    guestName.innerText =
-        `Bienvenido ${data.nombre_familia}`;
-
-    guestPasses.innerText =
-        `Hemos reservado ${data.pases} lugar/es para usted/es`;
+    guestName.innerText = `Bienvenido ${data.nombre_familia}`;
+    guestPasses.innerText = `Hemos reservado ${data.pases} lugares para ustedes`;
 
     if (confirmedInput) confirmedInput.max = data.pases;
 
-    // Restaurar valores guardados
     if (attendanceSelect && data.asistencia) {
         attendanceSelect.value = data.asistencia;
     }
@@ -96,35 +91,42 @@ async function cargarInvitado() {
         guestCountContainer.classList.remove("hidden");
     }
 
-    // Si ya confirmó
     if (data.asistencia) {
-        mostrarConfirmado();
+        mostrarConfirmado(data.asistencia);
     }
 }
 
 
 /* =====================
-   MODAL CONFIRMACION
+MODAL CONFIRMACION
 ===================== */
 
-const modal = document.getElementById("confirm-modal");
-const acceptConfirm = document.getElementById("accept-confirm");
-const cancelConfirm = document.getElementById("cancel-confirm");
-const confirmBtn = document.getElementById("confirm-btn");
+function initModal() {
 
-if (confirmBtn) {
+    const modal = document.getElementById("confirm-modal");
+    const modalText = document.getElementById("modal-text");
+    const acceptConfirm = document.getElementById("accept-confirm");
+    const cancelConfirm = document.getElementById("cancel-confirm");
+    const confirmBtn = document.getElementById("confirm-btn");
+
+    if (!modal || !confirmBtn) return;
+
     confirmBtn.addEventListener("click", () => {
+
+        const asistencia = document.getElementById("attendance").value;
+        if (!asistencia) return;
+
+        modalText.innerText =
+            asistencia === "si"
+                ? "¿Deseas confirmar tu asistencia?"
+                : "¿Deseas confirmar que no podrás asistir?";
+
         modal.classList.add("show");
     });
-}
 
-if (cancelConfirm) {
     cancelConfirm.addEventListener("click", () => {
         modal.classList.remove("show");
     });
-}
-
-if (acceptConfirm) {
 
     acceptConfirm.addEventListener("click", async () => {
 
@@ -136,29 +138,34 @@ if (acceptConfirm) {
 
         if (!asistencia) return;
 
-        if (asistencia === "si" && (!cantidad || cantidad <= 0)) return;
+        let confirmadosFinal = 0;
+
+        if (asistencia === "si") {
+            if (!cantidad || cantidad <= 0) return;
+            confirmadosFinal = Number(cantidad);
+        }
 
         const { error } = await db
             .from("invitaciones")
             .update({
                 asistencia: asistencia,
-                confirmados: cantidad,
+                confirmados: confirmadosFinal,
                 mensaje: mensaje
             })
             .eq("token", guestId);
 
         if (!error) {
-            mostrarConfirmado();
+            mostrarConfirmado(asistencia);
         }
     });
 }
 
 
 /* =====================
-   ESTADO CONFIRMADO
+ESTADO CONFIRMADO
 ===================== */
 
-function mostrarConfirmado() {
+function mostrarConfirmado(asistencia) {
 
     const confirmationMsg = document.getElementById("confirmation-message");
     const confirmBtn = document.getElementById("confirm-btn");
@@ -166,7 +173,10 @@ function mostrarConfirmado() {
     if (!confirmationMsg || !confirmBtn) return;
 
     confirmationMsg.innerText =
-        "✨ Gracias por confirmar tu asistencia. Nos vemos en nuestro gran día.";
+        asistencia === "si"
+            ? "✨ Gracias por confirmar tu asistencia. Nos vemos en nuestro gran día."
+            : "Gracias por avisarnos. Los extrañaremos en nuestro gran día.";
+
     confirmationMsg.classList.add("show");
 
     document.getElementById("attendance").disabled = true;
@@ -180,7 +190,143 @@ function mostrarConfirmado() {
 
 
 /* =====================
-   HERO ANIMATION
+CARRUSEL
+===================== */
+
+function initCarousel() {
+
+    const slides = document.querySelectorAll(".carousel-item");
+    const nextBtn = document.querySelector(".next");
+    const prevBtn = document.querySelector(".prev");
+
+    if (!slides.length) return;
+
+    let index = 0;
+    let autoSlide;
+
+    slides[0].classList.add("active");
+
+    function showSlide(i) {
+        slides.forEach(slide => slide.classList.remove("active"));
+        slides[i].classList.add("active");
+    }
+
+    function nextSlide() {
+        index = (index + 1) % slides.length;
+        showSlide(index);
+    }
+
+    function prevSlide() {
+        index = (index - 1 + slides.length) % slides.length;
+        showSlide(index);
+    }
+
+    function startAutoSlide() {
+        autoSlide = setInterval(nextSlide, 5000);
+    }
+
+    function resetAutoSlide() {
+        clearInterval(autoSlide);
+        startAutoSlide();
+    }
+
+    nextBtn?.addEventListener("click", () => {
+        nextSlide();
+        resetAutoSlide();
+    });
+
+    prevBtn?.addEventListener("click", () => {
+        prevSlide();
+        resetAutoSlide();
+    });
+
+    startAutoSlide();
+}
+
+/* =====================
+COPIAR NUMERO MESA REGALOS
+===================== */
+
+const giftNumber = document.getElementById("gift-number");
+const feedback = document.getElementById("gift-copy-feedback");
+
+if (giftNumber) {
+
+    giftNumber.addEventListener("click", async () => {
+
+        try {
+            await navigator.clipboard.writeText(giftNumber.innerText);
+
+            feedback.innerText = "Copiado ✓";
+            feedback.classList.add("show");
+
+            setTimeout(() => {
+                feedback.classList.remove("show");
+            }, 2000);
+
+        } catch {
+            feedback.innerText = "No se pudo copiar";
+            feedback.classList.add("show");
+        }
+
+    });
+
+}
+
+
+
+const giftNumberEl = document.getElementById("gift-number");
+
+if (giftNumberEl) {
+
+    const numeroOriginal =
+        giftNumberEl.childNodes[0].textContent.trim();
+
+    giftNumberEl.addEventListener("click", async () => {
+
+        try {
+            await navigator.clipboard.writeText(numeroOriginal);
+
+            // Cambiar visualmente
+            giftNumberEl.classList.add("copied");
+            giftNumberEl.childNodes[0].textContent = "✓ Copiado";
+
+            setTimeout(() => {
+                giftNumberEl.childNodes[0].textContent = numeroOriginal;
+                giftNumberEl.classList.remove("copied");
+            }, 2000);
+
+        } catch (err) {
+            console.error("Error copiando:", err);
+        }
+
+    });
+}
+
+const mapFrame = document.getElementById("map-frame");
+
+const maps = {
+    reino: "https://www.google.com/maps?q=Salon+del+Reino+Zacatecas&output=embed",
+    recepcion: "https://www.google.com/maps?q=Salon+Los+Olivos+Zacatecas&output=embed"
+};
+
+document.querySelectorAll(".timeline-item").forEach(item => {
+
+    item.addEventListener("click", () => {
+
+        const mapKey = item.dataset.map;
+
+        if (mapKey && maps[mapKey]) {
+            mapFrame.src = maps[mapKey];
+        }
+
+    });
+
+});
+
+
+/* =====================
+INIT GENERAL
 ===================== */
 
 window.addEventListener("load", () => {
@@ -194,94 +340,6 @@ window.addEventListener("load", () => {
     }
 
     cargarInvitado();
+    initModal();
+    initCarousel();
 });
-
-
-/* =====================
-   HERO SCROLL EFFECT
-===================== */
-
-window.addEventListener("scroll", () => {
-
-    if (!hero) return;
-
-    if (window.scrollY > 50) {
-        hero.classList.add("scrolled");
-    } else {
-        hero.classList.remove("scrolled");
-    }
-});
-
-
-/* =====================
-   MOSTRAR / OCULTAR INVITADOS
-===================== */
-
-const attendanceSelect = document.getElementById("attendance");
-const guestCountContainer = document.getElementById("guest-count-container");
-const confirmedCountInput = document.getElementById("confirmed-count");
-
-if (attendanceSelect) {
-
-    attendanceSelect.addEventListener("change", () => {
-
-        if (attendanceSelect.value === "si") {
-            guestCountContainer.classList.remove("hidden");
-        } else {
-            guestCountContainer.classList.add("hidden");
-            confirmedCountInput.value = "";
-        }
-
-    });
-
-}
-const slides = document.querySelectorAll(".carousel-item");
-const nextBtn = document.querySelector(".next");
-const prevBtn = document.querySelector(".prev");
-
-let index = 0;
-let autoSlide;
-
-function showSlide(i) {
-    slides.forEach(slide => slide.classList.remove("active"));
-    slides[i].classList.add("active");
-}
-
-function nextSlide() {
-    index = (index + 1) % slides.length;
-    showSlide(index);
-}
-
-function prevSlide() {
-    index = (index - 1 + slides.length) % slides.length;
-    showSlide(index);
-}
-
-if (nextBtn && prevBtn) {
-
-    nextBtn.addEventListener("click", () => {
-        nextSlide();
-        resetAutoSlide();
-    });
-
-    prevBtn.addEventListener("click", () => {
-        prevSlide();
-        resetAutoSlide();
-    });
-}
-
-function startAutoSlide() {
-    autoSlide = setInterval(nextSlide, 5000);
-}
-
-function resetAutoSlide() {
-    clearInterval(autoSlide);
-    startAutoSlide();
-}
-
-if (slides.length > 0) {
-    showSlide(index);
-    startAutoSlide();
-}
-
-

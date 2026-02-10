@@ -1,0 +1,185 @@
+/* =====================================================
+   ADMIN BASE
+===================================================== */
+
+.admin-container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+.admin-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.admin-title h2 {
+    font-size: 28px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+
+/* =====================================================
+   FILTROS
+===================================================== */
+
+.filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+
+.filter-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--olive);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.filter-btn:hover {
+    background: rgba(198,167,105,0.15);
+}
+
+.filter-btn.active {
+    background: var(--gold);
+    color: white;
+}
+
+.filter-summary {
+    text-align: center;
+    margin: 10px 0 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.filter-summary strong {
+    color: var(--olive);
+}
+
+.hidden {
+    display: none;
+}
+
+
+/* =====================================================
+   TOTALES
+===================================================== */
+
+.totals {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    text-align: center;
+}
+
+.total-item {
+    background: #FAFAF7;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.total-item span {
+    display: block;
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.total-item strong {
+    font-size: 24px;
+    color: var(--olive);
+}
+
+
+/* =====================================================
+   PROGRESS BAR
+===================================================== */
+
+.progress-container {
+    width: 100%;
+    height: 10px;
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--gold);
+    transition: width 0.6s ease;
+}
+
+#progress-text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+
+/* =====================================================
+   TABLA
+===================================================== */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+th {
+    color: var(--olive);
+}
+
+.pending-highlight {
+    background: rgba(198,167,105,0.15);
+    font-weight: 500;
+}
+
+.filter-summary {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+
+    .admin-container {
+        margin: 30px auto;
+        padding: 15px;
+    }
+
+    .totals {
+        grid-template-columns: 1fr;
+    }
+}
