@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Akari & Isai</title>
+
     <meta property="og:title" content="Akari & Isai | Nuestra Boda">
     <meta property="og:description" content="Nos encantaría compartir este día tan especial contigo. Confirma tu asistencia.">
-    <meta property="og:image" content="https://tudominio.com/images/portada.webp">
+    <meta property="og:image" content="https://invitacion-boda-isai-akari.vercel.app/images/portada.webp">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tudominio.com">
+    <meta property="og:url" content="https://invitacion-boda-isai-akari.vercel.app/">
 
     <link rel="stylesheet" href="css/styles.css">
 
@@ -17,33 +18,52 @@
 
 <body>
 
-
 <!-- HERO -->
 <section class="hero">
-    
+    <div class="hero-content"></div>
 </section>
 
 <!-- FECHA -->
 <section class="fecha fade-in">
-    <div class="overlay hero-content">
+    <div class="overlay fade-in">
         <h1 class="we_doit">¡Nos casamos!</h1>
         <span>18 de Julio 2026</span>
+
         <div class="contador">
-            <p>Faltan</p>
-            <p id="countdown"></p>
+            
+
+            <div class="contador-grid">
+
+                <div class="contador-box">
+                    <span id="days" class="contador-numero">0</span>
+                    <span class="contador-texto">Días</span>
+                </div>
+
+                <div class="contador-box">
+                    <span id="hours" class="contador-numero">0</span>
+                    <span class="contador-texto">Horas</span>
+                </div>
+
+                <div class="contador-box">
+                    <span id="minutes" class="contador-numero">0</span>
+                    <span class="contador-texto">Min</span>
+                </div>
+
+            </div>
         </div>
+
+
     </div>
 </section>
 
 <!-- MENSAJE -->
 <section class="mensaje fade-in">
     <div class="container">
-    <p>
-        Con mucha alegría queremos compartir este momento tan especial contigo.
-    </p>
+        <p>
+            Con mucha alegría queremos compartir este momento tan especial contigo.
+        </p>
     </div>
 </section>
-
 
 <!-- GALERIA -->
 <section class="galeria fade-in">
@@ -51,25 +71,23 @@
         <h2>Nuestros momentos</h2>
         <div class="divider"></div>
 
-        <div class="carousel active">
+        <div class="carousel">
             <button class="carousel-btn prev">&#10094;</button>
 
-        <div class="carousel-track">
-            <img src="images/foto1.png" class="carousel-item active" loading="lazy">
-            <img src="images/foto2.png" class="carousel-item" loading="lazy">
-            <img src="images/foto3.png" class="carousel-item" loading="lazy">
-            <img src="images/foto4.png" class="carousel-item" loading="lazy">
-        </div>
+            <div class="carousel-track">
+                <img src="images/foto1.png" class="carousel-item active" loading="lazy">
+                <img src="images/foto2.png" class="carousel-item" loading="lazy">
+                <img src="images/foto3.png" class="carousel-item" loading="lazy">
+                <img src="images/foto4.png" class="carousel-item" loading="lazy">
+            </div>
 
             <button class="carousel-btn next">&#10095;</button>
         </div>
     </div>
 </section>
 
-
-
-<!-- EVENTO -->
-<section class="itinerario fade-in">
+<!-- ITINERARIO -->
+<section id="timeline-section" class="itinerario fade-in  itinerario-section">
     <div class="container">
 
         <h2>Itinerario</h2>
@@ -77,9 +95,8 @@
 
         <div class="timeline">
 
-            <!-- CEREMONIA -->
             <div class="timeline-item" data-map="reino">
-                <div class="timeline-time">13:00 PM ·</div>
+                <div class="timeline-time">12:00 PM ·</div>
                 <div class="timeline-content">
                     <h3>Discurso</h3>
                     <p>Salón del Reino de los Testigos de Jehová</p>
@@ -87,27 +104,29 @@
                 </div>
             </div>
 
-            <div class="timeline-separator">
-                Traslado a recepción
-            </div>
+            
 
-            <!-- RECEPCIÓN -->
             <div class="timeline-item" data-map="recepcion">
-                <div class="timeline-time">15:00 PM ·</div>
-                <div class="timeline-content">
-                    <h3>Bienvenida</h3>
-                </div>
-            </div>
-
-            <div class="timeline-item secondary">
-                <div class="timeline-time"></div>
+                <div class="timeline-time">15:30 PM ·</div>
                 <div class="timeline-content">
                     <h3>Sesión de fotos</h3>
                 </div>
             </div>
 
+            <div class="timeline-separator">
+                Traslado a recepción
+            </div>
+
+
             <div class="timeline-item">
-                <div class="timeline-time">15:50 PM ·</div>
+                <div class="timeline-time">16:00 PM ·</div>
+                <div class="timeline-content">
+                    <h3>Recepción</h3>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-time">16:30 PM ·</div>
                 <div class="timeline-content">
                     <h3>Comida</h3>
                 </div>
@@ -142,27 +161,32 @@
     </div>
 </section>
 
-
+<!-- MAPA -->
 <section class="evento fade-in">
     <div class="container">
         <h2>Recepción</h2>
         <div class="divider"></div>
+
         <p>Salón Los Olivos</p>
-        <p>6:00 PM</p>
+        <p>16:00 PM</p>
 
         <div class="mapa">
             <iframe
-                src="https://www.google.com/maps?q=Zacatecas&output=embed"
+                id="map-frame"
+                src="https://www.google.com/maps?q=Salon+Los+Olivos+Zacatecas&output=embed"
                 loading="lazy">
             </iframe>
         </div>
-    </div>    
+    </div>
 </section>
 
-<section class="gift-section fade-in">
+<!-- MESA DE REGALOS -->
+<section id="mesa-section" class="gift-section fade-in">
     <div class="container regalos">
-         <h2>Mesa de regalos</h2>
-            <div class="divider"></div>
+
+        <h2>Mesa de regalos</h2>
+        <div class="divider"></div>
+
         <p>
             Tu presencia es lo más importante para nosotros, pero si deseas
             hacernos un obsequio, hemos creado una mesa de regalos en Liverpool.
@@ -176,38 +200,40 @@
             </span>
         </p>
 
-        <p class="gift-hint">Toca el número para copiar</p>
         
 
-
-
         <a href="https://mesaderegalos.liverpool.com.mx"
-        target="_blank"
-        class="gift-btn">
+           target="_blank"
+           class="gift-btn">
             Ver mesa de regalos
         </a>
-    </div>    
+    </div>
 </section>
-
 
 <!-- RSVP -->
 <section class="rsvp fade-in">
     <div class="container">
+
         <h2>Confirmar asistencia</h2>
 
         <p id="guest-name"></p>
         <p id="guest-passes"></p>
+        <div id="guest-table-card" class="guest-table-card hidden">
+            <span class="guest-table-label">Mesa asignada</span>
+            <div id="guest-table-number" class="guest-table-number">12</div>
+        </div>
+
 
         <select id="attendance">
             <option value="">Selecciona una opción</option>
             <option value="si">Sí asistiremos</option>
             <option value="no">No podremos asistir</option>
         </select>
+
         <div id="guest-count-container" class="hidden">
-            <label for="confirmed-count" class="input-label">
+            <label class="input-label">
                 Número de personas que asistirán
             </label>
-
             <input type="number" id="confirmed-count" min="0">
         </div>
 
@@ -215,21 +241,44 @@
 
         <button id="confirm-btn">Confirmar</button>
         <p id="confirmation-message" class="confirmation-message"></p>
+
     </div>
 </section>
+
 <div id="confirm-modal" class="modal">
     <div class="modal-content">
-        <p id="modal-text">¿Deseas confirmar tu asistencia?</p>
 
+        <p id="modal-text"></p>
 
         <div class="modal-buttons">
-            <button id="cancel-confirm" class="btn-secondary">Cancelar</button>
-            <button id="accept-confirm" class="btn-primary">Confirmar</button>
+            <button id="cancel-confirm" class="btn-secondary">
+                Cancelar
+            </button>
+
+            <button id="accept-confirm" class="btn-primary">
+                Confirmar
+            </button>
         </div>
+
+    </div>
+</div>
+<div id="limit-modal" class="modal">
+    <div class="modal-content modal-small">
+
+        <p id="limit-text"></p>
+
+        <div class="modal-buttons center">
+            <button id="limit-ok" class="btn-primary">
+                Entendido
+            </button>
+        </div>
+
     </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/app.js"></script>
+
 </body>
 </html>

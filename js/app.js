@@ -8,52 +8,88 @@ const db = window.supabase.createClient(
     supabaseKey
 );
 /* =====================
-VARIABLES
+   VARIABLES
 ===================== */
 
-const weddingDate = new Date("Jul 18, 2026 18:00:00").getTime();
+const weddingDate = new Date("Jul 18, 2026 12:00:00").getTime();
 const params = new URLSearchParams(window.location.search);
 const guestId = params.get("id");
 
-const hero = document.querySelector(".hero");
-
 /* =====================
-COUNTDOWN
+   COUNTDOWN
 ===================== */
 
 function updateCountdown() {
-    const countdownEl = document.getElementById("countdown");
-    if (!countdownEl) return;
-
     const now = new Date().getTime();
     const distance = weddingDate - now;
 
+    if (distance <= 0) return;
+
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    countdownEl.innerHTML = days + " días";
+    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((distance / (1000 * 60)) % 60);
+
+    document.getElementById("days").innerText = days;
+    document.getElementById("hours").innerText = hours;
+    document.getElementById("minutes").innerText = minutes;
 }
+
 
 setInterval(updateCountdown, 1000);
 
-
 /* =====================
-SCROLL ANIMATION
+   SCROLL ANIMATION
 ===================== */
-
-const elements = document.querySelectorAll(".fade-in");
 
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting)
             entry.target.classList.add("visible");
-        }
     });
 }, { threshold: 0.2 });
 
-elements.forEach(el => observer.observe(el));
-
+document.querySelectorAll(".fade-in")
+    .forEach(el => observer.observe(el));
 
 /* =====================
-CARGAR INVITADO
+   MOSTRAR INPUT PERSONAS
+===================== */
+
+function actualizarVistaAsistencia() {
+
+    const select = document.getElementById("attendance");
+    const container = document.getElementById("guest-count-container");
+    const input = document.getElementById("confirmed-count");
+
+    if (!select || !container) return;
+
+    if (select.value === "si") {
+        container.classList.remove("hidden");
+    } else {
+        container.classList.add("hidden");
+        input.value = "";
+    }
+}
+
+/* =====================
+   TIPO INVITADO
+===================== */
+
+function aplicarTipoInvitado(tipo) {
+
+    const itinerario = document.getElementById("timeline-section");
+    const mesaCard = document.getElementById("guest-table-card");
+
+    if (tipo === "baile") {
+        itinerario?.classList.add("hidden");
+        mesaCard?.classList.add("hidden");
+    } else {
+        itinerario?.classList.remove("hidden");
+    }
+}
+
+/* =====================
+   CARGAR INVITADO
 ===================== */
 
 async function cargarInvitado() {
@@ -62,7 +98,6 @@ async function cargarInvitado() {
     const guestPasses = document.getElementById("guest-passes");
     const confirmedInput = document.getElementById("confirmed-count");
     const attendanceSelect = document.getElementById("attendance");
-    const guestCountContainer = document.getElementById("guest-count-container");
 
     if (!guestId || !guestName) return;
 
@@ -77,44 +112,95 @@ async function cargarInvitado() {
         return;
     }
 
-    guestName.innerText = `Bienvenido ${data.nombre_familia}`;
-    guestPasses.innerText = `Hemos reservado ${data.pases} lugares para ustedes`;
+    const pases = Number(data.pases || 0);
 
-    if (confirmedInput) confirmedInput.max = data.pases;
+    guestName.innerText =
+        pases === 1
+            ? `Bienvenid@ ${data.nombre_familia}`
+            : `Bienvenidos ${data.nombre_familia}`;
 
-    if (attendanceSelect && data.asistencia) {
+    guestPasses.innerText =
+        `Hemos reservado ${pases} lugares para ustedes`;
+
+    /* ===== MESA ===== */
+
+    const tableCard = document.getElementById("guest-table-card");
+    const tableNumber = document.getElementById("guest-table-number");
+
+    if (data.mesa && data.tipo_invitado?.toLowerCase() === "banquete") {
+        tableNumber.innerText = data.mesa;
+        tableCard.classList.remove("hidden");
+
+setTimeout(() => {
+    tableCard.classList.add("show");
+}, 150);
+
+    }
+
+    aplicarTipoInvitado(data.tipo_invitado);
+
+    if (data.tipo_invitado === "baile") {
+        guestPasses.innerText =
+            "Te esperamos para celebrar con nosotros en la fiesta 🎉";
+    }
+
+    if (confirmedInput) confirmedInput.max = pases;
+
+    if (attendanceSelect && data.asistencia)
         attendanceSelect.value = data.asistencia;
-    }
 
-    if (confirmedInput && data.confirmados) {
+    if (confirmedInput && data.confirmados)
         confirmedInput.value = data.confirmados;
-        guestCountContainer.classList.remove("hidden");
-    }
 
-    if (data.asistencia) {
+    actualizarVistaAsistencia();
+
+    if (data.asistencia)
         mostrarConfirmado(data.asistencia);
-    }
 }
 
-
 /* =====================
-MODAL CONFIRMACION
+   MODAL CONFIRMACION
 ===================== */
 
 function initModal() {
 
     const modal = document.getElementById("confirm-modal");
     const modalText = document.getElementById("modal-text");
-    const acceptConfirm = document.getElementById("accept-confirm");
-    const cancelConfirm = document.getElementById("cancel-confirm");
-    const confirmBtn = document.getElementById("confirm-btn");
+    const accept = document.getElementById("accept-confirm");
+    const cancel = document.getElementById("cancel-confirm");
+    const btn = document.getElementById("confirm-btn");
 
-    if (!modal || !confirmBtn) return;
+    if (!modal || !btn) return;
 
-    confirmBtn.addEventListener("click", () => {
+    btn.addEventListener("click", () => {
 
         const asistencia = document.getElementById("attendance").value;
+        const cantidad = Number(document.getElementById("confirmed-count").value);
+        const max = Number(document.getElementById("confirmed-count").max);
+
         if (!asistencia) return;
+
+        /* VALIDACION ANTES DEL MODAL */
+
+        if (asistencia === "si") {
+
+            if (!cantidad || cantidad <= 0) return;
+
+            if (cantidad > max) {
+
+                modalText.innerText =
+                    `Esta invitación tiene ${max} pases asignados.\n\nPor favor verifica el número de asistentes.`;
+
+                accept.style.display = "none";
+                cancel.innerText = "Entendido";
+
+                modal.classList.add("show");
+                return;
+            }
+        }
+
+        accept.style.display = "";
+        cancel.innerText = "Cancelar";
 
         modalText.innerText =
             asistencia === "si"
@@ -124,222 +210,159 @@ function initModal() {
         modal.classList.add("show");
     });
 
-    cancelConfirm.addEventListener("click", () => {
-        modal.classList.remove("show");
-    });
+    cancel.addEventListener("click", () =>
+        modal.classList.remove("show")
+    );
 
-    acceptConfirm.addEventListener("click", async () => {
+    accept.addEventListener("click", async () => {
 
         modal.classList.remove("show");
 
         const asistencia = document.getElementById("attendance").value;
-        const cantidad = document.getElementById("confirmed-count").value;
+        const cantidad = Number(document.getElementById("confirmed-count").value);
         const mensaje = document.getElementById("message").value;
 
-        if (!asistencia) return;
-
-        let confirmadosFinal = 0;
-
-        if (asistencia === "si") {
-            if (!cantidad || cantidad <= 0) return;
-            confirmadosFinal = Number(cantidad);
-        }
+        const confirmadosFinal =
+            asistencia === "si" ? cantidad : 0;
 
         const { error } = await db
             .from("invitaciones")
             .update({
-                asistencia: asistencia,
+                asistencia,
                 confirmados: confirmadosFinal,
-                mensaje: mensaje
+                mensaje
             })
             .eq("token", guestId);
 
-        if (!error) {
+        if (!error)
             mostrarConfirmado(asistencia);
-        }
     });
 }
 
-
 /* =====================
-ESTADO CONFIRMADO
+   ESTADO CONFIRMADO
 ===================== */
 
 function mostrarConfirmado(asistencia) {
 
-    const confirmationMsg = document.getElementById("confirmation-message");
-    const confirmBtn = document.getElementById("confirm-btn");
+    const msg = document.getElementById("confirmation-message");
+    const btn = document.getElementById("confirm-btn");
 
-    if (!confirmationMsg || !confirmBtn) return;
-
-    confirmationMsg.innerText =
+    msg.innerText =
         asistencia === "si"
             ? "✨ Gracias por confirmar tu asistencia. Nos vemos en nuestro gran día."
             : "Gracias por avisarnos. Los extrañaremos en nuestro gran día.";
 
-    confirmationMsg.classList.add("show");
+    msg.classList.add("show");
 
-    document.getElementById("attendance").disabled = true;
-    document.getElementById("confirmed-count").disabled = true;
-    document.getElementById("message").disabled = true;
+    ["attendance","confirmed-count","message"]
+        .forEach(id => document.getElementById(id).disabled = true);
 
-    confirmBtn.disabled = true;
-    confirmBtn.innerText = "Confirmado ✓";
-    confirmBtn.classList.add("confirmed");
+    btn.disabled = true;
+    btn.innerText = "Confirmado ✓";
+    btn.classList.add("confirmed");
 }
 
-
 /* =====================
-CARRUSEL
+   CARRUSEL
 ===================== */
 
 function initCarousel() {
 
     const slides = document.querySelectorAll(".carousel-item");
+    if (!slides.length) return;
+
     const nextBtn = document.querySelector(".next");
     const prevBtn = document.querySelector(".prev");
 
-    if (!slides.length) return;
-
     let index = 0;
-    let autoSlide;
 
-    slides[0].classList.add("active");
-
-    function showSlide(i) {
-        slides.forEach(slide => slide.classList.remove("active"));
+    function show(i) {
+        slides.forEach(s => s.classList.remove("active"));
         slides[i].classList.add("active");
     }
 
-    function nextSlide() {
+    function next() {
         index = (index + 1) % slides.length;
-        showSlide(index);
+        show(index);
     }
 
-    function prevSlide() {
+    function prev() {
         index = (index - 1 + slides.length) % slides.length;
-        showSlide(index);
+        show(index);
     }
 
-    function startAutoSlide() {
-        autoSlide = setInterval(nextSlide, 5000);
-    }
-
-    function resetAutoSlide() {
-        clearInterval(autoSlide);
-        startAutoSlide();
-    }
+    show(0);
+    let autoSlide = setInterval(next, 5000);
 
     nextBtn?.addEventListener("click", () => {
-        nextSlide();
-        resetAutoSlide();
+        next();
+        clearInterval(autoSlide);
+        autoSlide = setInterval(next, 5000);
     });
 
     prevBtn?.addEventListener("click", () => {
-        prevSlide();
-        resetAutoSlide();
+        prev();
+        clearInterval(autoSlide);
+        autoSlide = setInterval(next, 5000);
     });
-
-    startAutoSlide();
 }
 
 /* =====================
-COPIAR NUMERO MESA REGALOS
+   COPIAR MESA REGALOS
 ===================== */
 
-const giftNumber = document.getElementById("gift-number");
-const feedback = document.getElementById("gift-copy-feedback");
+function initGiftCopy() {
 
-if (giftNumber) {
+    const giftNumber = document.getElementById("gift-number");
+    if (!giftNumber) return;
+
+    const icon = giftNumber.querySelector(".copy-icon");
 
     giftNumber.addEventListener("click", async () => {
 
-        try {
-            await navigator.clipboard.writeText(giftNumber.innerText);
-
-            feedback.innerText = "Copiado ✓";
-            feedback.classList.add("show");
-
-            setTimeout(() => {
-                feedback.classList.remove("show");
-            }, 2000);
-
-        } catch {
-            feedback.innerText = "No se pudo copiar";
-            feedback.classList.add("show");
-        }
-
-    });
-
-}
-
-
-
-const giftNumberEl = document.getElementById("gift-number");
-
-if (giftNumberEl) {
-
-    const numeroOriginal =
-        giftNumberEl.childNodes[0].textContent.trim();
-
-    giftNumberEl.addEventListener("click", async () => {
+        const numero =
+            giftNumber.childNodes[0].textContent.trim();
 
         try {
-            await navigator.clipboard.writeText(numeroOriginal);
+            await navigator.clipboard.writeText(numero);
 
-            // Cambiar visualmente
-            giftNumberEl.classList.add("copied");
-            giftNumberEl.childNodes[0].textContent = "✓ Copiado";
+            // animación salida icono
+            icon.classList.add("copied");
 
             setTimeout(() => {
-                giftNumberEl.childNodes[0].textContent = numeroOriginal;
-                giftNumberEl.classList.remove("copied");
-            }, 2000);
+                icon.textContent = "✔";
+                icon.classList.remove("copied");
+                icon.classList.add("success");
+            }, 150);
+
+            // regresar al icono original
+            setTimeout(() => {
+                icon.textContent = "📋";
+                icon.classList.remove("success");
+            }, 1150);
 
         } catch (err) {
             console.error("Error copiando:", err);
         }
-
     });
 }
 
-const mapFrame = document.getElementById("map-frame");
-
-const maps = {
-    reino: "https://www.google.com/maps?q=Salon+del+Reino+Zacatecas&output=embed",
-    recepcion: "https://www.google.com/maps?q=Salon+Los+Olivos+Zacatecas&output=embed"
-};
-
-document.querySelectorAll(".timeline-item").forEach(item => {
-
-    item.addEventListener("click", () => {
-
-        const mapKey = item.dataset.map;
-
-        if (mapKey && maps[mapKey]) {
-            mapFrame.src = maps[mapKey];
-        }
-
-    });
-
-});
-
 
 /* =====================
-INIT GENERAL
+   INIT
 ===================== */
 
 window.addEventListener("load", () => {
 
-    const heroContent = document.querySelector(".hero-content");
-
-    if (heroContent) {
-        setTimeout(() => {
-            heroContent.classList.add("show");
-        }, 300);
-    }
+    document.querySelector(".hero-content")
+        ?.classList.add("show");
 
     cargarInvitado();
     initModal();
     initCarousel();
+    initGiftCopy();
+
+    document.getElementById("attendance")
+        ?.addEventListener("change", actualizarVistaAsistencia);
 });

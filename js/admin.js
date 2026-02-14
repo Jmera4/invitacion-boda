@@ -20,14 +20,43 @@ if (key !== ADMIN_KEY) {
         "<h2 style='text-align:center;margin-top:50px;'>Acceso no autorizado</h2>";
 }
 
-
 /* =====================
-   VARIABLES
+   VARIABLES GLOBALES
 ===================== */
 
 let invitacionesGlobal = [];
 let filtroActivo = "todos";
 
+/* =====================
+   ORDENAR INVITADOS
+===================== */
+
+function ordenarInvitados(lista) {
+
+    const ordenEstado = {
+        "si": 1,
+        null: 2,
+        undefined: 2,
+        "no": 3
+    };
+
+    return lista.sort((a, b) => {
+
+        const estadoA = a.asistencia ?? null;
+        const estadoB = b.asistencia ?? null;
+
+        // Confirmados arriba
+        if (ordenEstado[estadoA] !== ordenEstado[estadoB]) {
+            return ordenEstado[estadoA] - ordenEstado[estadoB];
+        }
+
+        // Dentro del mismo estado ordenar por mesa
+        const mesaA = Number(a.mesa || 999);
+        const mesaB = Number(b.mesa || 999);
+
+        return mesaA - mesaB;
+    });
+}
 
 /* =====================
    CARGAR DATOS
@@ -41,16 +70,15 @@ async function cargarDatos() {
         .order("nombre_familia");
 
     if (error) {
-        console.error(error);
+        console.error("Error cargando datos:", error);
         return;
     }
 
-    invitacionesGlobal = data;
+    invitacionesGlobal = data || [];
 
     calcularTotales();
     renderTabla();
 }
-
 
 /* =====================
    CALCULAR TOTALES
@@ -90,6 +118,42 @@ function calcularTotales() {
         `${totalConfirmados} / ${totalInvitados} confirmados (${porcentaje}%)`;
 }
 
+/* =====================
+   FILTRAR LISTA
+===================== */
+
+function obtenerListaFiltrada() {
+
+    let lista = [...invitacionesGlobal];
+
+    if (filtroActivo === "pendientes") {
+        return lista
+            .filter(inv => !inv.asistencia)
+            .sort((a, b) =>
+                Number(b.pases || 0) - Number(a.pases || 0)
+            );
+    }
+
+    if (filtroActivo === "cancelados") {
+        return ordenarInvitados(
+            lista.filter(inv => inv.asistencia === "no")
+        );
+    }
+
+    if (filtroActivo === "banquete") {
+        return ordenarInvitados(
+            lista.filter(inv => inv.tipo_invitado === "banquete")
+        );
+    }
+
+    if (filtroActivo === "baile") {
+        return ordenarInvitados(
+            lista.filter(inv => inv.tipo_invitado === "baile")
+        );
+    }
+
+    return ordenarInvitados(lista);
+}
 
 /* =====================
    RENDER TABLA
@@ -100,36 +164,7 @@ function renderTabla() {
     const tabla = document.getElementById("tabla");
     tabla.innerHTML = "";
 
-    let lista = [...invitacionesGlobal];
-
-    if (filtroActivo === "todos") {
-
-        lista.sort((a, b) => {
-
-            const orden = {
-                "si": 1,
-                null: 2,
-                "no": 3
-            };
-
-            const estadoA = a.asistencia ?? null;
-            const estadoB = b.asistencia ?? null;
-
-            return orden[estadoA] - orden[estadoB];
-        });
-    }
-
-    if (filtroActivo === "pendientes") {
-        lista = lista
-            .filter(inv => inv.asistencia === null)
-            .sort((a, b) =>
-                Number(b.pases || 0) - Number(a.pases || 0)
-            );
-    }
-
-    if (filtroActivo === "cancelados") {
-        lista = lista.filter(inv => inv.asistencia === "no");
-    }
+    const lista = obtenerListaFiltrada();
 
     lista.forEach(inv => {
 
@@ -137,13 +172,15 @@ function renderTabla() {
         const confirmados = Number(inv.confirmados || 0);
 
         const highlightClass =
-            (inv.asistencia !== "si" && pases >= 4)
+            (!inv.asistencia && pases >= 4)
                 ? "pending-highlight"
                 : "";
 
         tabla.innerHTML += `
             <tr class="${highlightClass}">
                 <td>${inv.nombre_familia}</td>
+                <td>${inv.tipo_invitado || "-"}</td>
+                <td>${inv.mesa || "-"}</td>
                 <td>${pases}</td>
                 <td>${confirmados}</td>
                 <td>${inv.asistencia || "-"}</td>
@@ -154,6 +191,11 @@ function renderTabla() {
 
     actualizarResumenFiltro();
 }
+
+/* =====================
+   RESUMEN FILTRO
+===================== */
+
 function actualizarResumenFiltro() {
 
     const summary = document.getElementById("filter-summary");
@@ -171,7 +213,7 @@ function actualizarResumenFiltro() {
 
         const pases = Number(inv.pases || 0);
 
-        if (filtroActivo === "pendientes" && !inv.asistencia){
+        if (filtroActivo === "pendientes" && !inv.asistencia) {
             familias++;
             personas += pases;
         }
@@ -195,50 +237,64 @@ function actualizarResumenFiltro() {
     summary.classList.remove("hidden");
 }
 
-
-
 /* =====================
    BOTONES FILTRO
 ===================== */
 
-const btnAll = document.getElementById("filter-all");
-const btnPending = document.getElementById("filter-pending");
-const btnCancelled = document.getElementById("filter-cancelled");
+function initFiltros() {
 
-function activarBotonActivo(boton) {
-    document.querySelectorAll(".filter-btn")
-        .forEach(btn => btn.classList.remove("active"));
+    const btnAll = document.getElementById("filter-all");
+    const btnPending = document.getElementById("filter-pending");
+    const btnCancelled = document.getElementById("filter-cancelled");
+    const btnBanquete = document.getElementById("filter-banquete");
+    const btnBaile = document.getElementById("filter-baile");
 
-    boton.classList.add("active");
+    function activar(btn) {
+        document.querySelectorAll(".filter-btn")
+            .forEach(b => b.classList.remove("active"));
+
+        btn.classList.add("active");
+    }
+
+    btnAll?.addEventListener("click", () => {
+        filtroActivo = "todos";
+        activar(btnAll);
+        renderTabla();
+    });
+
+    btnPending?.addEventListener("click", () => {
+        filtroActivo = "pendientes";
+        activar(btnPending);
+        renderTabla();
+    });
+
+    btnCancelled?.addEventListener("click", () => {
+        filtroActivo = "cancelados";
+        activar(btnCancelled);
+        renderTabla();
+    });
+
+    btnBanquete?.addEventListener("click", () => {
+        filtroActivo = "banquete";
+        activar(btnBanquete);
+        renderTabla();
+    });
+
+    btnBaile?.addEventListener("click", () => {
+        filtroActivo = "baile";
+        activar(btnBaile);
+        renderTabla();
+    });
 }
 
-btnAll.addEventListener("click", () => {
-    filtroActivo = "todos";
-    activarBotonActivo(btnAll);
-    renderTabla();
-});
-
-btnPending.addEventListener("click", () => {
-    filtroActivo = "pendientes";
-    activarBotonActivo(btnPending);
-    renderTabla();
-});
-
-btnCancelled.addEventListener("click", () => {
-    filtroActivo = "cancelados";
-    activarBotonActivo(btnCancelled);
-    renderTabla();
-});
-
-
 /* =====================
-   INICIAR
+   INIT
 ===================== */
 
 window.addEventListener("load", () => {
 
+    initFiltros();
     cargarDatos();
 
     setInterval(cargarDatos, 30000);
-
 });
