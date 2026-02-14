@@ -64,7 +64,7 @@ p {
     line-height: 1.7;
     max-width: 600px;
     margin: auto;
-    font-size: 23px;
+    font-size: 20px;
 }
 
 .we_doit {
@@ -708,7 +708,6 @@ button.confirmed:hover {
 }
 
 .gift-section {
-    width: 100%;
     background: #FAFAF7;
     padding: 100px 20px;
 }
@@ -1084,5 +1083,60 @@ table {
     .contador-box {
         padding: 12px 14px;
         min-width: auto;
+    }
+}
+/* =========================
+   FIX CENTRADO MESA REGALOS MOBILE
+========================= */
+
+.gift-section .regalos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.gift-section p {
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* asegura que el número quede centrado */
+.gift-code {
+    width: 100%;
+    text-align: center;
+}
+
+/* botón perfectamente centrado */
+.gift-btn {
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (max-width: 480px) {
+    .gift-number {
+        font-size: 20px;
+        padding: 10px 18px;
+    }
+}
+/* =========================
+   FIX CENTRADO REAL MESA REGALOS
+========================= */
+
+.gift-section .regalos {
+    max-width: 420px;   /* 👈 clave */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* evita que el párrafo empuje el balance visual */
+.gift-section .regalos p {
+    max-width: 100%;
+}
+@media (max-width: 480px) {
+    .gift-section p {
+        font-size: 18px;
     }
 }
