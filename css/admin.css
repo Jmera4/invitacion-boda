@@ -30,47 +30,53 @@
    FILTROS
 ===================================================== */
 
+/* =========================
+   FILTROS ADMIN PANEL
+========================= */
+
 .filters {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    max-width: 420px;
+    margin: 25px auto 35px auto;
 }
 
-
+/* botón base */
 .filter-btn {
     background: transparent;
-    border: 1px solid var(--gold);
+    border: 1.5px solid var(--gold);
     color: var(--olive);
-    padding: 8px 16px;
-    border-radius: 20px;
+
+    padding: 12px 16px;
+    border-radius: 30px;
+
+    font-size: 16px;
+    font-weight: 500;
+
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all .25s ease;
 }
 
+/* hover */
 .filter-btn:hover {
     background: rgba(198,167,105,0.15);
+    transform: translateY(-1px);
 }
 
+/* activo */
 .filter-btn.active {
     background: var(--gold);
     color: white;
+    border-color: var(--gold);
+    box-shadow: 0 6px 16px rgba(198,167,105,0.25);
 }
 
-.filter-summary {
-    text-align: center;
-    margin: 10px 0 20px;
-    font-size: 14px;
-    color: #666;
-}
-
-.filter-summary strong {
-    color: var(--olive);
-}
-
-.hidden {
-    display: none;
+/* el primero ocupa toda la fila */
+.filter-btn:first-child {
+    grid-column: span 2;
+    font-weight: 600;
 }
 
 
