@@ -26,6 +26,10 @@ if (key !== ADMIN_KEY) {
 
 let invitacionesGlobal = [];
 let filtroActivo = "todos";
+let guestIdSeleccionado = null;
+const baseURL = window.location.origin.includes("127.0.0.1")
+    ? "https://invitacion-boda-isai-akari.vercel.app/"
+    : window.location.origin + "/";
 
 /* =====================
    ORDENAR INVITADOS
@@ -45,12 +49,10 @@ function ordenarInvitados(lista) {
         const estadoA = a.asistencia ?? null;
         const estadoB = b.asistencia ?? null;
 
-        // Confirmados arriba
         if (ordenEstado[estadoA] !== ordenEstado[estadoB]) {
             return ordenEstado[estadoA] - ordenEstado[estadoB];
         }
 
-        // Dentro del mismo estado ordenar por mesa
         const mesaA = Number(a.mesa || 999);
         const mesaB = Number(b.mesa || 999);
 
@@ -70,7 +72,7 @@ async function cargarDatos() {
         .order("nombre_familia");
 
     if (error) {
-        console.error("Error cargando datos:", error);
+        console.error("Error:", error);
         return;
     }
 
@@ -79,6 +81,40 @@ async function cargarDatos() {
     calcularTotales();
     renderTabla();
 }
+
+/* =====================
+   GUARDAR MENSAJE
+===================== */
+
+document.getElementById("guardar-mensaje")?.addEventListener("click", async () => {
+
+    const mensaje = document.getElementById("mensaje-personalizado").value.trim();
+
+    if (!guestIdSeleccionado) {
+        alert("Selecciona un invitado");
+        return;
+    }
+
+    if (!mensaje) {
+        alert("Escribe un mensaje");
+        return;
+    }
+
+    const { error } = await db
+        .from("invitaciones")
+        .update({ mensaje_personalizado: mensaje })
+        .eq("token", guestIdSeleccionado);
+
+    if (error) {
+        console.error(error);
+        alert("Error al guardar");
+        return;
+    }
+
+    showToast("Mensaje enviado ✨");
+
+    cargarDatos(); // refresca
+});
 
 /* =====================
    CALCULAR TOTALES
@@ -111,11 +147,10 @@ function calcularTotales() {
     document.getElementById("confirmados").innerText = totalConfirmados;
     document.getElementById("asistentes").innerText = totalAsistentes;
 
-    document.getElementById("progress-bar").style.width =
-        porcentaje + "%";
+    document.getElementById("progress-bar").style.width = porcentaje + "%";
 
     document.getElementById("progress-text").innerText =
-        `${totalConfirmados} / ${totalInvitados} confirmados (${porcentaje}%)`;
+        `${totalConfirmados} / ${totalInvitados} (${porcentaje}%)`;
 }
 
 /* =====================
@@ -127,29 +162,23 @@ function obtenerListaFiltrada() {
     let lista = [...invitacionesGlobal];
 
     if (filtroActivo === "pendientes") {
-        return lista
-            .filter(inv => !inv.asistencia)
-            .sort((a, b) =>
-                Number(b.pases || 0) - Number(a.pases || 0)
-            );
+        return lista.filter(inv => !inv.asistencia);
     }
 
     if (filtroActivo === "cancelados") {
-        return ordenarInvitados(
-            lista.filter(inv => inv.asistencia === "no")
-        );
+        return lista.filter(inv => inv.asistencia === "no");
     }
 
     if (filtroActivo === "banquete") {
-        return ordenarInvitados(
-            lista.filter(inv => inv.tipo_invitado === "banquete")
-        );
+        return lista.filter(inv => inv.tipo_invitado === "banquete");
     }
 
     if (filtroActivo === "baile") {
-        return ordenarInvitados(
-            lista.filter(inv => inv.tipo_invitado === "baile")
-        );
+        return lista.filter(inv => inv.tipo_invitado === "baile");
+    }
+
+    if (filtroActivo === "enviados") {
+        return lista.filter(inv => inv.enviado === true);
     }
 
     return ordenarInvitados(lista);
@@ -176,115 +205,178 @@ function renderTabla() {
                 ? "pending-highlight"
                 : "";
 
+        const tipo = (inv.tipo_invitado || "-").toUpperCase();
+        const asistencia = (inv.asistencia || "-").toUpperCase();
+
         tabla.innerHTML += `
-            <tr class="${highlightClass}">
-                <td>${inv.nombre_familia}</td>
-                <td>${inv.tipo_invitado || "-"}</td>
-                <td>${inv.mesa || "-"}</td>
-                <td>${pases}</td>
-                <td>${confirmados}</td>
-                <td>${inv.asistencia || "-"}</td>
-                <td>${inv.mensaje || ""}</td>
-            </tr>
+        <tr class="${highlightClass} ${inv.enviado ? 'enviado' : ''}">
+            <td>
+                <input type="checkbox"
+                    ${inv.enviado ? "checked" : ""}
+                    onchange="toggleEnviado('${inv.token}', this.checked)">
+            </td>
+
+            <td>
+                <button class="copy-btn" onclick="copiarLink('${inv.token}')">
+                    📋
+                </button>
+            </td>
+
+            <td class="col-nombre">${inv.nombre_familia.toUpperCase()}</td>
+            <td class="col-miembros">${inv.miembros || "-"}</td>
+            <td>${tipo}</td>
+            <td>${inv.mesa || "-"}</td>
+            <td>${pases}</td>
+            <td>${confirmados}</td>
+            <td>${asistencia}</td>
+            <td>${inv.mensaje || ""}</td>
+            <td>${inv.mensaje_personalizado || ""}</td>
+        </tr>
         `;
     });
-
-    actualizarResumenFiltro();
 }
 
 /* =====================
-   RESUMEN FILTRO
+   SELECCIONAR INVITADO
 ===================== */
 
-function actualizarResumenFiltro() {
+// function seleccionarInvitado(token, nombre) {
 
-    const summary = document.getElementById("filter-summary");
-    if (!summary) return;
+//     guestIdSeleccionado = token;
 
-    if (filtroActivo === "todos") {
-        summary.classList.add("hidden");
-        return;
-    }
+//     const invitado = invitacionesGlobal.find(i => i.token === token);
 
-    let familias = 0;
-    let personas = 0;
+//     document.getElementById("mensaje-personalizado").value =
+//         invitado?.mensaje_personalizado || "";
 
-    invitacionesGlobal.forEach(inv => {
+//     alert("Editando: " + nombre);
+// }
 
-        const pases = Number(inv.pases || 0);
+/* =====================
+   BUSCADOR
+===================== */
 
-        if (filtroActivo === "pendientes" && !inv.asistencia) {
-            familias++;
-            personas += pases;
+function initBuscadorInvitados() {
+
+    const input = document.getElementById("buscar-invitado");
+    const resultados = document.getElementById("resultados-busqueda");
+
+    if (!input || !resultados) return;
+
+    input.addEventListener("input", () => {
+
+        const valor = input.value.toLowerCase().trim();
+
+        resultados.innerHTML = "";
+
+        if (!valor) {
+            resultados.classList.add("hidden");
+            return;
         }
 
-        if (filtroActivo === "cancelados" && inv.asistencia === "no") {
-            familias++;
-            personas += pases;
+        const filtrados = invitacionesGlobal.filter(inv =>
+            inv.nombre_familia.toLowerCase().includes(valor)
+        );
+
+        if (!filtrados.length) {
+            resultados.classList.add("hidden");
+            return;
         }
+
+        resultados.classList.remove("hidden");
+
+        filtrados.forEach(inv => {
+
+            const div = document.createElement("div");
+            div.className = "resultado-item";
+            div.innerText = `${inv.nombre_familia} · ${inv.miembros || ""}`;
+
+            div.onclick = () => {
+
+                guestIdSeleccionado = inv.token;
+
+                input.value = inv.nombre_familia;
+
+                document.getElementById("mensaje-personalizado").value =
+                    inv.mensaje_personalizado || "";
+
+                resultados.classList.add("hidden");
+            };
+
+            resultados.appendChild(div);
+        });
     });
 
-    if (filtroActivo === "pendientes") {
-        summary.innerHTML =
-            `Pendientes: <strong>${familias}</strong> familias (${personas} personas)`;
-    }
-
-    if (filtroActivo === "cancelados") {
-        summary.innerHTML =
-            `Cancelados: <strong>${familias}</strong> familias (${personas} personas)`;
-    }
-
-    summary.classList.remove("hidden");
+    document.addEventListener("click", (e) => {
+        if (!input.contains(e.target) && !resultados.contains(e.target)) {
+            resultados.classList.add("hidden");
+        }
+    });
 }
 
 /* =====================
-   BOTONES FILTRO
+   FILTROS
 ===================== */
 
 function initFiltros() {
 
-    const btnAll = document.getElementById("filter-all");
-    const btnPending = document.getElementById("filter-pending");
-    const btnCancelled = document.getElementById("filter-cancelled");
-    const btnBanquete = document.getElementById("filter-banquete");
-    const btnBaile = document.getElementById("filter-baile");
+    document.querySelectorAll(".filter-btn").forEach(btn => {
 
-    function activar(btn) {
-        document.querySelectorAll(".filter-btn")
-            .forEach(b => b.classList.remove("active"));
+        btn.addEventListener("click", () => {
 
-        btn.classList.add("active");
-    }
+            document.querySelectorAll(".filter-btn")
+                .forEach(b => b.classList.remove("active"));
 
-    btnAll?.addEventListener("click", () => {
-        filtroActivo = "todos";
-        activar(btnAll);
-        renderTabla();
+            btn.classList.add("active");
+
+            filtroActivo = btn.id.replace("filter-", "");
+            renderTabla();
+        });
     });
+}
+function showToast(texto = "Mensaje guardado ✨") {
 
-    btnPending?.addEventListener("click", () => {
-        filtroActivo = "pendientes";
-        activar(btnPending);
-        renderTabla();
-    });
+    const toast = document.getElementById("toast");
 
-    btnCancelled?.addEventListener("click", () => {
-        filtroActivo = "cancelados";
-        activar(btnCancelled);
-        renderTabla();
-    });
+    if (!toast) return;
 
-    btnBanquete?.addEventListener("click", () => {
-        filtroActivo = "banquete";
-        activar(btnBanquete);
-        renderTabla();
-    });
+    toast.innerText = texto;
 
-    btnBaile?.addEventListener("click", () => {
-        filtroActivo = "baile";
-        activar(btnBaile);
-        renderTabla();
-    });
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+function copiarLink(token) {
+
+    const link = `${baseURL}?id=${token}`;
+
+    navigator.clipboard.writeText(link);
+
+    mostrarToast("Link copiado ✨");
+}
+async function toggleEnviado(token, estado) {
+
+    await db
+        .from("invitaciones")
+        .update({ enviado: estado })
+        .eq("token", token);
+
+    mostrarToast(
+        estado ? "Marcado como enviado ✅" : "Desmarcado ❌"
+    );
+}
+function mostrarToast(texto) {
+
+    const toast = document.getElementById("toast");
+
+    toast.innerText = texto;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2200);
 }
 
 /* =====================
@@ -294,7 +386,9 @@ function initFiltros() {
 window.addEventListener("load", () => {
 
     initFiltros();
+    initBuscadorInvitados();
     cargarDatos();
 
-    setInterval(cargarDatos, 30000);
+    setInterval(cargarDatos, 15000);
 });
+

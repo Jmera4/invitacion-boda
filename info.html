@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información para invitados | Akari & Isai</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/info.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- HERO -->
+<section class="info-hero">
+    <div class="info-hero-content">
+        <h1>Información para invitados</h1>
+        <p>Queremos que tu visita sea cómoda y agradable.</p>
+    </div>
+</section>
+
+<!-- UBICACION -->
+<section class="info-section">
+    <div class="container">
+
+        <h2>Ubicación del evento</h2>
+        <div class="divider"></div>
+        <div class="salon-card">
+        <p>
+            La recepción se llevara a cabo en el siguiente salón:
+        </p>
+
+        <p class="place-name">Salón Espacio Verde</p>
+
+        <div class="mapa">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d271.27036766547224!2d-103.02998681245643!3d23.826972818637834!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x868491ac82155621%3A0xa005a061c7eb29d7!2sEspacio%20Verde!5e0!3m2!1sen!2smx!4v1771888226485!5m2!1sen!2smx"
+                loading="lazy">
+            </iframe>
+        </div>
+
+        <a href="https://maps.app.goo.gl/C6GuBoB4A1akvx2Y7" target="_blank" class="primary-btn">
+            Abrir en Google Maps
+        </a>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- HOSPEDAJE -->
+<section class="info-section alt">
+    <div class="container">
+
+        <h2>Hospedaje sugerido</h2>
+        <div class="divider"></div>
+
+        <p>
+            Si vienes de fuera, estas son algunas opciones cercanas
+            al salón del evento.
+        </p>
+
+        <div class="hotel-list">
+
+            <div class="hotel-card">
+                <h3>Hotel Ejemplo 1</h3>
+                <p>A 8 minutos del salón</p>
+                <a href="#" target="_blank">Ver ubicación</a>
+            </div>
+
+            <div class="hotel-card">
+                <h3>Hotel Ejemplo 2</h3>
+                <p>A 10 minutos del salón</p>
+                <a href="#" target="_blank">Ver ubicación</a>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- PUNTOS DE REFERENCIA -->
+<section class="info-section">
+    <div class="container">
+
+        <h2>Puntos de referencia</h2>
+        <div class="divider"></div>
+
+        <div class="reference-list">
+
+            <div class="hotel-card">
+                <h3>Central de Autobuses</h3>
+                <p>Aproximadamente 15 minutos del salón.</p>
+                <a href="https://maps.app.goo.gl/W7ZiVouTAYykB2Ne9" target="_blank">Ver ubicación</a>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- VOLVER -->
+<section class="back-section">
+    <a id="back-link" href="index.html" class="primary-btn">
+        Volver a la invitación
+    </a>
+</section>
+<script>
+const params = new URLSearchParams(window.location.search);
+const guestId = params.get("id");
+
+const backLink = document.getElementById("back-link");
+
+if (backLink && guestId) {
+    backLink.href = `index.html?id=${guestId}`;
+}
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Confirmaciones</title>
 
-    <link rel="stylesheet" href="css/styles.css">
+
     <link rel="stylesheet" href="css/admin.css">
 
     <style>
@@ -91,6 +91,10 @@
             Todos
         </button>
 
+        <button id="filter-enviados" class="filter-btn">
+            Invitacion enviada
+        </button>
+
         <button id="filter-pending" class="filter-btn">
             Pendientes
         </button>
@@ -112,19 +116,43 @@
 
     <div class="card totals">
         <div class="total-item">
-            <span>Total invitados</span>
+            <span>Total invitados: </span>
             <strong id="total"></strong>
         </div>
 
         <div class="total-item">
-            <span>Confirmados</span>
+            <span>Confirmados: </span>
             <strong id="confirmados"></strong>
         </div>
 
         <div class="total-item">
-            <span>Total asistentes</span>
+            <span>Total asistentes: </span>
             <strong id="asistentes"></strong>
         </div>
+    </div>
+
+    <div class="card premium-card">
+
+        <h2 class="premium-title">Mensaje personalizado</h2>
+
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="buscar-invitado"
+                placeholder="Buscar familia o invitado..."
+            >
+            <div id="resultados-busqueda" class="resultados hidden"></div>
+        </div>
+
+        <textarea 
+            id="mensaje-personalizado"
+            placeholder="Escribe un mensaje especial..."
+        ></textarea>
+
+        <button id="guardar-mensaje" class="premium-btn">
+            Enviar mensaje
+        </button>
+
     </div>
 
     <div class="progress-container">
@@ -138,13 +166,17 @@
             <table>
                 <thead>
                     <tr>
+                        <th>¿Enviado?</th>
+                        <th>Link</th>
                         <th>Familia</th>
+                        <th>Miembros</th>
                         <th>Tipo</th>
                         <th>Mesa</th>
                         <th>Pases</th>
                         <th>Confirmados</th>
                         <th>Asistencia</th>
                         <th>Mensaje</th>
+                        <th>Mensaje personalizado</th>
                     </tr>
                 </thead>
                 <tbody id="tabla"></tbody>
@@ -152,6 +184,9 @@
         </div>
     </div>
 
+</div>
+<div id="toast" class="toast">
+    Mensaje enviado ✨
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

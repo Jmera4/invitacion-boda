@@ -79,25 +79,51 @@ function aplicarTipoInvitado(tipo) {
 
     const itinerario = document.getElementById("timeline-section");
     const mesaCard = document.getElementById("guest-table-card");
+    const badge = document.getElementById("baile-badge");
+    const titulo = document.getElementById("evento-titulo");
+    const hora = document.getElementById("evento-hora");
+    const discurso = document.getElementById("discurso-section");
 
     if (tipo === "baile") {
         itinerario?.classList.add("hidden");
         mesaCard?.classList.add("hidden");
+        badge?.classList.remove("hidden");
+        discurso?.classList.add("hidden");
+        titulo.innerText = "Baile";
+        hora.innerText = "18:30 PM"; // 👈 aquí tu cambio
+
     } else {
         itinerario?.classList.remove("hidden");
+        badge?.classList.add("hidden");
+        discurso?.classList.remove("hidden");
+        titulo.innerText = "Recepción";
+        hora.innerText = "16:00 PM"; // 👈 aseguras consistencia
     }
 }
 
 /* =====================
    CARGAR INVITADO
 ===================== */
+function generarTextoPases(tipo, pases) {
 
+    const esPlural = pases > 1;
+    const palabra = tipo === "baile"
+        ? (esPlural ? "pases" : "pase")
+        : (esPlural ? "lugares" : "lugar");
+
+    const destinatario = esPlural ? "ustedes" : "ti";
+
+    return `Hemos reservado ${pases} ${palabra} para ${destinatario}`;
+}
 async function cargarInvitado() {
 
     const guestName = document.getElementById("guest-name");
     const guestPasses = document.getElementById("guest-passes");
+    const mensajePersonalizado = document.getElementById("mensaje-personalizado");
     const confirmedInput = document.getElementById("confirmed-count");
     const attendanceSelect = document.getElementById("attendance");
+    const detalleMesas = document.getElementById("detalle-mesas");
+    const mesaNormal = document.getElementById("evento-hora"); // o donde muestras mesa
 
     if (!guestId || !guestName) return;
 
@@ -112,6 +138,25 @@ async function cargarInvitado() {
         return;
     }
 
+    if (data.mensaje_personalizado && mensajePersonalizado) {
+        mensajePersonalizado.innerHTML = `
+            <strong>💌 Un mensaje para ti:</strong><br><br>
+            ${data.mensaje_personalizado}
+        `;
+        mensajePersonalizado.classList.remove("hidden");
+    }
+    if (data.detalle_mesas && detalleMesas) {
+
+        detalleMesas.innerHTML = data.detalle_mesas.replaceAll("|", "<br>");
+        detalleMesas.classList.remove("hidden");
+
+        // ocultar mesa normal
+        if (mesaNormal) {
+            mesaNormal.style.display = "none";
+        }
+
+    }
+
     const pases = Number(data.pases || 0);
 
     guestName.innerText =
@@ -120,7 +165,7 @@ async function cargarInvitado() {
             : `Bienvenidos ${data.nombre_familia}`;
 
     guestPasses.innerText =
-        `Hemos reservado ${pases} lugares para ustedes`;
+    generarTextoPases(data.tipo_invitado?.toLowerCase(), pases);
 
     /* ===== MESA ===== */
 
@@ -267,90 +312,53 @@ function mostrarConfirmado(asistencia) {
    CARRUSEL
 ===================== */
 
-function initCarousel() {
 
-    const slides = document.querySelectorAll(".carousel-item");
-    if (!slides.length) return;
-
-    const nextBtn = document.querySelector(".next");
-    const prevBtn = document.querySelector(".prev");
-
-    let index = 0;
-
-    function show(i) {
-        slides.forEach(s => s.classList.remove("active"));
-        slides[i].classList.add("active");
-    }
-
-    function next() {
-        index = (index + 1) % slides.length;
-        show(index);
-    }
-
-    function prev() {
-        index = (index - 1 + slides.length) % slides.length;
-        show(index);
-    }
-
-    show(0);
-    let autoSlide = setInterval(next, 5000);
-
-    nextBtn?.addEventListener("click", () => {
-        next();
-        clearInterval(autoSlide);
-        autoSlide = setInterval(next, 5000);
-    });
-
-    prevBtn?.addEventListener("click", () => {
-        prev();
-        clearInterval(autoSlide);
-        autoSlide = setInterval(next, 5000);
-    });
-}
 
 /* =====================
    COPIAR MESA REGALOS
 ===================== */
 
-function initGiftCopy() {
+function initCopyElements() {
 
-    const giftNumber = document.getElementById("gift-number");
-    if (!giftNumber) return;
+    const elements = document.querySelectorAll(".gift-number");
 
-    const icon = giftNumber.querySelector(".copy-icon");
+    elements.forEach(el => {
 
-    giftNumber.addEventListener("click", async () => {
+        const icon = el.querySelector(".copy-icon");
 
-        const numero =
-            giftNumber.childNodes[0].textContent.trim();
+        el.addEventListener("click", async () => {
 
-        try {
-            await navigator.clipboard.writeText(numero);
+            const text =
+                el.childNodes[0].textContent.trim();
 
-            // animación salida icono
-            icon.classList.add("copied");
+            try {
+                await navigator.clipboard.writeText(text);
 
-            setTimeout(() => {
-                icon.textContent = "✔";
-                icon.classList.remove("copied");
-                icon.classList.add("success");
-            }, 150);
+                icon.classList.add("copied");
 
-            // regresar al icono original
-            setTimeout(() => {
-                icon.textContent = "📋";
-                icon.classList.remove("success");
-            }, 1150);
+                setTimeout(() => {
+                    icon.textContent = "✔";
+                    icon.classList.remove("copied");
+                    icon.classList.add("success");
+                }, 150);
 
-        } catch (err) {
-            console.error("Error copiando:", err);
-        }
+                setTimeout(() => {
+                    icon.textContent = "📋";
+                    icon.classList.remove("success");
+                }, 1150);
+
+            } catch (err) {
+                console.error("Error copiando:", err);
+            }
+
+        });
+
     });
 }
 
 
 /* =====================
-   INIT
+INIT
 ===================== */
 
 window.addEventListener("load", () => {
@@ -360,9 +368,140 @@ window.addEventListener("load", () => {
 
     cargarInvitado();
     initModal();
-    initCarousel();
-    initGiftCopy();
+    initCopyElements();
 
     document.getElementById("attendance")
         ?.addEventListener("change", actualizarVistaAsistencia);
 });
+
+const infoLink = document.getElementById("info-link");
+
+if (infoLink && guestId) {
+    infoLink.href = `info.html?id=${guestId}`;
+}
+
+function initCarouselPremium() {
+
+    const track = document.querySelector(".carousel-track");
+    let cards = Array.from(document.querySelectorAll(".carousel-card"));
+
+    if (!cards.length) return;
+
+    const original = [...cards];
+
+    // 🔥 TRIPLICAR (clave para loop real)
+    // triplicado
+    original.forEach(card => track.appendChild(card.cloneNode(true)));
+    original.forEach(card => track.appendChild(card.cloneNode(true)));
+
+    cards = Array.from(document.querySelectorAll(".carousel-card"));
+
+    let index = original.length; // 👈 empezamos en el bloque del medio
+
+    function update() {
+
+        const gap = parseInt(getComputedStyle(track).gap) || 0;
+        const cardWidth = cards[0].offsetWidth + gap;
+        const containerWidth = track.parentElement.offsetWidth;
+
+        const offset =
+            (index * cardWidth) - (containerWidth / 2) + (cardWidth / 2);
+
+        track.style.transform = `translateX(-${offset}px)`;
+
+        cards.forEach((card, i) => {
+            card.classList.remove("active", "near");
+
+            if (i === index) {
+                card.classList.add("active");
+            } else if (i === index - 1 || i === index + 1) {
+                card.classList.add("near");
+            }
+        });
+    }
+
+    function next() {
+
+        const middleEnd = original.length * 2;
+
+        // 🔥 PRE-CORRECCIÓN (antes del movimiento)
+        if (index >= middleEnd - 1) {
+
+            track.style.transition = "none";
+
+            index -= original.length;
+            update();
+
+            // forzar repaint
+            track.offsetHeight;
+
+            track.style.transition = "transform 1s cubic-bezier(0.22,1,0.36,1)";
+        }
+
+        // ahora sí avanzas normal
+        index++;
+        update();
+    }
+
+    // autoplay
+    setInterval(next, 2600);
+
+    // INIT
+    window.addEventListener("load", () => {
+        setTimeout(() => {
+            track.style.transition = "none";
+            update();
+
+            requestAnimationFrame(() => {
+                track.style.transition = "transform 1s cubic-bezier(0.22,1,0.36,1)";
+            });
+        }, 100);
+    });
+
+    window.addEventListener("resize", update);
+}
+
+initCarouselPremium();
+
+function initRSVPFlow() {
+
+    const steps = document.querySelectorAll(".step");
+    let current = 0;
+
+    function goToStep(i) {
+        steps[current].classList.remove("active");
+        current = i;
+        steps[current].classList.add("active");
+    }
+
+    // botones continuar
+    document.querySelectorAll(".next-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            goToStep(current + 1);
+        });
+    });
+
+    // opciones SI/NO
+    const options = document.querySelectorAll(".option-btn");
+
+    options.forEach(btn => {
+        btn.addEventListener("click", () => {
+
+            options.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            document.getElementById("attendance").value =
+                btn.dataset.value;
+
+            if (btn.dataset.value === "no") {
+                goToStep(3); // saltar personas
+            } else {
+                goToStep(2);
+            }
+        });
+    });
+}
+
+initRSVPFlow();
+
+// PRUEBAS
