@@ -2569,3 +2569,260 @@ textarea {
 
     text-align: left;
 }
+
+.mesa-placeholder {
+    font-size: 15px;
+    color: #777;
+    text-align: center;
+    margin-top: 10px;
+
+    font-style: italic;
+    letter-spacing: 0.5px;
+
+    opacity: 0.8;
+}
+
+/* PRUEBA DE UBICACIONES */
+.ubicacion {
+    background: #f5f8ec;
+}
+
+.ubicacion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+
+    align-items: start;
+    justify-content: center;
+
+    max-width: 700px;
+    margin: 40px auto 0;
+}
+
+/* CARD */
+.ubicacion-card {
+    text-align: center;
+    position: relative;
+}
+
+/* TITULO */
+.ubicacion-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+/* ICONO */
+.ubicacion-icon {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+/* IMAGEN */
+.ubicacion-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ubicacion-img img {
+    width: 170px;
+    height: 170px;
+
+    object-fit: cover;
+    object-position: center; /* 👈 clave */
+
+    border-radius: 50%;
+}
+
+/* BOTON */
+/* =========================
+   UBICACIÓN
+========================= */
+
+.ubicacion {
+    background: #f5f8ec;
+}
+
+/* GRID */
+.ubicacion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+
+    align-items: start; /* 👈 importante */
+    justify-content: center;
+
+    max-width: 700px;
+    margin: 40px auto 0;
+}
+
+/* CARD */
+.ubicacion-card {
+    text-align: center;
+}
+
+/* TITULO */
+.ubicacion-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    margin-bottom: 15px;
+    color: var(--olive);
+}
+
+/* IMAGEN */
+.ubicacion-img img {
+    width: 170px;
+    height: 170px;
+    object-fit: cover;
+
+    border-radius: 50%;
+    margin-bottom: 18px;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* BOTÓN (usa el mismo estilo premium que ya tienes) */
+.ubicacion-card .gift-btn {
+    font-size: 14px;
+    padding: 12px 26px;
+}
+
+/* =========================
+   MOBILE FIX 🔥
+========================= */
+
+@media (max-width: 600px) {
+
+    .ubicacion-grid {
+        gap: 20px;
+        padding: 0 10px;
+
+        max-width: 320px; /* 👈 hace que se vea centrado y elegante */
+        margin: 30px auto 0;
+    }
+
+    .ubicacion-card h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .ubicacion-img img {
+        width: 110px;
+        height: 110px;
+        margin-bottom: 12px;
+    }
+
+    .ubicacion-card .gift-btn {
+        font-size: 12px;
+        padding: 8px 14px;
+    }
+}
+
+/* HORA BONITA */
+.hora-badge {
+    display: inline-block;
+    margin: 8px auto 15px;
+
+    padding: 6px 14px;
+
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    color: var(--gold);
+
+    border: 1px solid rgba(198,167,105,0.4);
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.6);
+}
+
+.hora-badge {
+    box-shadow:
+        0 4px 12px rgba(198,167,105,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.6);
+}
+/* CUANDO SOLO HAY UNA CARD */
+.ubicacion-grid.single {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
+/* CENTRADO EXTRA PRO */
+.ubicacion-grid.single .ubicacion-card {
+    text-align: center;
+}
+
+.ubicacion.ubicacion-baile {
+    background: var(--white);
+}
+
+/* FOCUS INDIVIDUAL */
+
+
+.ubicacion-baile .hora-badge {
+    font-size: 16px;
+    letter-spacing: 1px;
+
+    padding: 10px 22px;
+
+    border-radius: 999px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(198,167,105,0.15),
+        rgba(198,167,105,0.05)
+    );
+
+    border: 1px solid rgba(198,167,105,0.4);
+
+    box-shadow:
+        0 8px 25px rgba(198,167,105,0.25);
+
+    color: var(--olive);
+}
+
+.ubicacion-baile .ubicacion-card {
+    transform: scale(1.1);
+}
+.ubicacion-baile {
+    padding-top: 60px;
+    padding-bottom: 60px;
+}
+
+@media (max-width: 600px) {
+    .ubicacion-baile .ubicacion-card {
+        transform: scale(1.05);
+    }
+    .ubicacion-baile .hora-badge {
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+}
+
+@media (min-width: 768px) {
+    .ubicacion-img img {
+        width: 220px;
+        height: 220px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .ubicacion-img img {
+        width: 260px;
+        height: 260px;
+    }
+}
+
+.rsvp .container.compact {
+    padding: 35px 30px;
+}
+
+.rsvp .container.compact textarea {
+    min-height: 80px;
+}
+
+.rsvp .container.compact #guest-passes {
+    margin-bottom: 15px;
+}

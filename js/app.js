@@ -77,28 +77,49 @@ function actualizarVistaAsistencia() {
 
 function aplicarTipoInvitado(tipo) {
 
+    tipo = tipo?.toLowerCase().trim(); // 🔥 ESTA LÍNEA ARREGLA TODO
+
     const itinerario = document.getElementById("timeline-section");
     const mesaCard = document.getElementById("guest-table-card");
     const badge = document.getElementById("baile-badge");
-    const titulo = document.getElementById("evento-titulo");
-    const hora = document.getElementById("evento-hora");
-    const discurso = document.getElementById("discurso-section");
+    
+    const cardCeremonia = document.getElementById("card-ceremonia");
+    const horaRecepcion = document.getElementById("hora-recepcion");
+    const grid = document.querySelector(".ubicacion-grid");
+    const ubicacionSection = document.querySelector(".ubicacion");
+    const rsvpContainer = document.querySelector(".guest-table-card");
+    console.log("TIPO INVITADO:", tipo);
 
     if (tipo === "baile") {
-        itinerario?.classList.add("hidden");
-        mesaCard?.classList.add("hidden");
-        badge?.classList.remove("hidden");
-        discurso?.classList.add("hidden");
-        titulo.innerText = "Baile";
-        hora.innerText = "18:30 PM"; // 👈 aquí tu cambio
 
-    } else {
-        itinerario?.classList.remove("hidden");
-        badge?.classList.add("hidden");
-        discurso?.classList.remove("hidden");
-        titulo.innerText = "Recepción";
-        hora.innerText = "16:00 PM"; // 👈 aseguras consistencia
+        cardCeremonia?.classList.add("hidden");
+        badge?.classList.remove("hidden");
+        mesaCard?.classList.add("hidden");
+        itinerario?.classList.add("hidden");
+        grid?.classList.add("single");
+        ubicacionSection?.classList.add("ubicacion-baile");
+        rsvpContainer?.classList.add("compact");
+
+        if (horaRecepcion) {
+            horaRecepcion.classList.remove("hidden");
+            horaRecepcion.style.display = "inline-block"; // 🔥 importante
+            horaRecepcion.innerText = "4:00 PM";
+        }
+
+    } else if (tipo === "banquete") {
+
+        cardCeremonia?.classList.remove("hidden");
+        grid?.classList.remove("single");
+        ubicacionSection?.classList.remove("ubicacion-baile");
+        rsvpContainer?.classList.remove("compact");
+
+        if (horaRecepcion) {
+            horaRecepcion.classList.add("hidden");
+            horaRecepcion.style.display = "none"; // 💣 esto lo mata sí o sí
+        }
     }
+
+
 }
 
 /* =====================
@@ -132,7 +153,9 @@ async function cargarInvitado() {
         .select("*")
         .eq("token", guestId)
         .single();
-
+    console.log("DATA INVITADO:", data);
+    console.log("TOKEN:", guestId);
+    console.log("PASES RAW:", data?.pases);
     if (error || !data) {
         guestName.innerText = "Invitación no válida";
         return;
@@ -147,18 +170,26 @@ async function cargarInvitado() {
     }
     if (data.detalle_mesas && detalleMesas) {
 
-        detalleMesas.innerHTML = data.detalle_mesas.replaceAll("|", "<br>");
-        detalleMesas.classList.remove("hidden");
+        const contenido = data.detalle_mesas.trim();
 
-        // ocultar mesa normal
-        if (mesaNormal) {
-            mesaNormal.style.display = "none";
+        if (contenido) {
+            detalleMesas.innerHTML = contenido.replaceAll("|", "<br>");
+            detalleMesas.classList.remove("hidden");
+
+            if (mesaNormal) {
+                mesaNormal.style.display = "none";
+            }
+
+        } else {
+            detalleMesas.classList.add("hidden");
         }
-
     }
 
-    const pases = Number(data.pases || 0);
+    const pases = Number(data.pases);
 
+    if (isNaN(pases)) {
+        console.warn("Pases inválidos:", data.pases);
+    }
     guestName.innerText =
         pases === 1
             ? `Bienvenid@ ${data.nombre_familia}`
@@ -173,24 +204,41 @@ async function cargarInvitado() {
     const tableNumber = document.getElementById("guest-table-number");
 
     if (data.mesa && data.tipo_invitado?.toLowerCase() === "banquete") {
-        tableNumber.innerText = data.mesa;
-        tableCard.classList.remove("hidden");
 
-setTimeout(() => {
-    tableCard.classList.add("show");
-}, 150);
+        const { data: config } = await db
+            .from("configuracion")
+            .select("mostrar_mesas")
+            .eq("id", 1)
+            .maybeSingle();
 
+        if (config?.mostrar_mesas) {
+            tableNumber.innerText = data.mesa;
+            tableCard.classList.remove("hidden");
+
+            setTimeout(() => {
+                tableCard.classList.add("show");
+            }, 150);
+        }
     }
 
     aplicarTipoInvitado(data.tipo_invitado);
+    setTimeout(() => {
+        const hora = document.getElementById("hora-recepcion");
+        if (data.tipo_invitado?.toLowerCase().trim() === "banquete") {
+            hora?.classList.add("hidden");
+            hora.style.display = "none";
+        }
+    }, 0);
 
-    if (data.tipo_invitado === "baile") {
-        guestPasses.innerText =
-            "Te esperamos para celebrar con nosotros en la fiesta 🎉";
+    if (data.tipo_invitado?.toLowerCase().trim() === "baile") {
+
+        guestPasses.innerHTML = `
+        ${generarTextoPases("baile", pases)}`;
     }
 
-    if (confirmedInput) confirmedInput.max = pases;
-
+    if (confirmedInput && pases > 0) {
+        confirmedInput.max = pases;
+    }
     if (attendanceSelect && data.asistencia)
         attendanceSelect.value = data.asistencia;
 
@@ -223,6 +271,16 @@ function initModal() {
         const cantidad = Number(document.getElementById("confirmed-count").value);
         const max = Number(document.getElementById("confirmed-count").max);
 
+        if (max <= 0) {
+            modalText.innerText =
+                "Hubo un problema con tu invitación. Contacta a los novios.";
+
+            accept.style.display = "none";
+            cancel.innerText = "Entendido";
+
+            modal.classList.add("show");
+            return;
+        }
         if (!asistencia) return;
 
         /* VALIDACION ANTES DEL MODAL */
@@ -366,6 +424,7 @@ window.addEventListener("load", () => {
     document.querySelector(".hero-content")
         ?.classList.add("show");
 
+    aplicarVisibilidadMesas();    
     cargarInvitado();
     initModal();
     initCopyElements();
@@ -505,3 +564,24 @@ function initRSVPFlow() {
 initRSVPFlow();
 
 // PRUEBAS
+async function aplicarVisibilidadMesas() {
+
+    const { data } = await db
+        .from("configuracion")
+        .select("mostrar_mesas")
+        .eq("id", 1)
+        .maybeSingle();
+
+    const mostrar = data?.mostrar_mesas;
+
+    const tableCard = document.getElementById("guest-table-card");
+    const detalle = document.getElementById("detalle-mesas");
+
+    if (!mostrar) {
+        tableCard?.classList.add("hidden");
+        detalle?.classList.add("hidden");
+    } else {
+        tableCard?.classList.remove("hidden");
+        detalle?.classList.remove("hidden");
+    }
+}
