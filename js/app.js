@@ -11,7 +11,7 @@ const db = window.supabase.createClient(
    VARIABLES
 ===================== */
 
-const weddingDate = new Date("Jul 18, 2026 12:00:00").getTime();
+const weddingDate = new Date("Jul 18, 2026 14:00:00").getTime();
 const params = new URLSearchParams(window.location.search);
 const guestId = params.get("id");
 
@@ -249,6 +249,12 @@ async function cargarInvitado() {
 
     if (data.asistencia)
         mostrarConfirmado(data.asistencia);
+
+    const footerNote = document.querySelector(".confirm-footer-note");
+
+    if (data.asistencia && footerNote) {
+        footerNote.classList.add("hidden");
+    }
 }
 
 /* =====================
@@ -429,8 +435,26 @@ window.addEventListener("load", () => {
     initModal();
     initCopyElements();
 
-    document.getElementById("attendance")
-        ?.addEventListener("change", actualizarVistaAsistencia);
+    const attendanceSelect = document.getElementById("attendance");
+    const footerNote = document.querySelector(".confirm-footer-note");
+
+    if (attendanceSelect && footerNote) {
+
+        attendanceSelect.addEventListener("change", () => {
+
+            actualizarVistaAsistencia(); // 👈 ya lo tienes
+
+            const value = attendanceSelect.value;
+
+            if (value === "si" || value === "no") {
+                footerNote.classList.add("hidden");
+            } else {
+                footerNote.classList.remove("hidden");
+            }
+
+        });
+    }
+
 });
 
 const infoLink = document.getElementById("info-link");

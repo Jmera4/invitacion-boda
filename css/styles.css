@@ -95,7 +95,7 @@ p, span, select, input, textarea {
 .hero {
     position: relative;
     min-height: 75vh;
-    background: url('../images/portada.webp') center/cover no-repeat;
+    background: url('../images/portada.webp') center/cover no-repeat; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2825,4 +2825,93 @@ textarea {
 
 .rsvp .container.compact #guest-passes {
     margin-bottom: 15px;
+}
+
+.dresscode-card {
+    text-align: center;
+    padding: 40px 30px;
+    background-color: #fafaf7;
+}
+
+.dresscode-main {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold);
+    margin: 10px 0 15px;
+    letter-spacing: 1px;
+}
+
+.dresscode-note {
+    font-size: 14px;
+    color: #777;
+    max-width: 420px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+}
+
+.dresscode-colors {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.color-circle {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+
+    transition: transform 0.25s ease;
+}
+
+.color-circle:hover {
+    transform: scale(1.1);
+}
+
+/* .final-note {
+    text-align: center;
+    margin:  auto 40px;
+
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+
+    color: var(--olive);
+
+    max-width: 600px;
+    line-height: 1.8;
+
+    padding: 20px 30px;
+
+    border-top: 1px solid rgba(0,0,0,0.08);
+} */
+/* .confirm-alert {
+    background: rgba(105,117,34,0.08);
+    color: var(--olive);
+
+    padding: 14px 18px;
+    margin-bottom: 20px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    text-align: center;
+
+    border: 1px solid rgba(105,117,34,0.15);
+} */
+.confirm-footer-note {
+    margin-top: 20px;
+    font-size: 15px;
+    color: var(--olive);
+    text-align: center;
+}
+@media (max-width:600px){
+    .confirm-footer-note {
+        font-size: 13px;
+        padding: 0 10px;
+    }
 }

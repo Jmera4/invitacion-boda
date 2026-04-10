@@ -669,7 +669,7 @@ document.getElementById("crear-invitado")?.addEventListener("click", async () =>
     const detalle = document.getElementById("nuevo-detalle").value.trim();
 
     // 🔴 VALIDACIÓN
-    if (!tipo || !nombre || !pases) {
+    if (!tipo || !nombre || !pases || !mesa) {
         showAlert("Faltan datos obligatorios");
         return;
     }
