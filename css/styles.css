@@ -2848,6 +2848,9 @@ textarea {
     margin: 0 auto 20px;
     line-height: 1.6;
 }
+.dresscode-note b{
+    font-size: 15px;
+}
 
 .dresscode-colors {
     display: flex;
