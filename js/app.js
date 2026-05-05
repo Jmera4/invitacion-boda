@@ -103,7 +103,7 @@ function aplicarTipoInvitado(tipo) {
         if (horaRecepcion) {
             horaRecepcion.classList.remove("hidden");
             horaRecepcion.style.display = "inline-block"; // 🔥 importante
-            horaRecepcion.innerText = "4:00 PM";
+            horaRecepcion.innerText = "6:30 PM";
         }
 
     } else if (tipo === "banquete") {
