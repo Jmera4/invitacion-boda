@@ -276,8 +276,11 @@ function renderTabla() {
                 ${inv.nombre_familia.toUpperCase()}
             </td>
 
-            <td class="col-miembros">
-                ${(inv.miembros || "-").replaceAll("|", "<br>")}
+            <td>
+                <textarea
+                    class="input-miembros"
+                    onblur="editarMiembros('${inv.token}', this.value)"
+                >${(inv.miembros || "").replaceAll("|", ", ")}</textarea>
             </td>
 
             
@@ -298,7 +301,14 @@ function renderTabla() {
                 >${inv.detalle_mesas || ""}</textarea>
             </td>
 
-            <td>${pases}</td>
+            <td>
+                <input
+                    type="number"
+                    value="${pases}"
+                    class="input-pases"
+                    onblur="editarPases('${inv.token}', this.value)"
+                >
+            </td>
 
             <td>${confirmados}</td>
 
@@ -344,6 +354,45 @@ async function editarDetalle(token, texto) {
         .eq("token", token);
 
     mostrarToast("Detalle actualizado ✨");
+}
+
+async function editarPases(token, nuevosPases) {
+
+    const { error } = await db
+        .from("invitaciones")
+        .update({ pases: Number(nuevosPases) })
+        .eq("token", token);
+
+    if (error) {
+        console.error(error);
+        showToast("Error al actualizar pases ❌");
+        return;
+    }
+
+    showToast("Pases actualizados 🎟️");
+}
+
+async function editarMiembros(token, texto) {
+
+    // convertir comas a formato interno con |
+    const limpio = texto
+        .split(",")
+        .map(t => t.trim())
+        .filter(t => t)
+        .join("|");
+
+    const { error } = await db
+        .from("invitaciones")
+        .update({ miembros: limpio })
+        .eq("token", token);
+
+    if (error) {
+        console.error(error);
+        showToast("Error al actualizar miembros ❌");
+        return;
+    }
+
+    showToast("Miembros actualizados 👨‍👩‍👧‍👦");
 }
 /* =====================
    BUSCADOR
