@@ -184,7 +184,11 @@ function obtenerListaFiltrada() {
             (inv.asistencia || "").toLowerCase().trim() === "no"
         );
     }
-
+    if (filtroActivo === "confirmados") {
+        lista = lista.filter(inv =>
+            (inv.asistencia || "").toLowerCase().trim() === "si"
+        );
+    }
     if (filtroActivo === "banquete") {
         lista = lista.filter(inv => inv.tipo_invitado === "banquete");
     }
