@@ -189,6 +189,12 @@ function obtenerListaFiltrada() {
             (inv.asistencia || "").toLowerCase().trim() === "si"
         );
     }
+    if (filtroActivo === "pendientes") {
+        lista = lista.filter(inv => {
+            const estado = (inv.asistencia || "").toLowerCase().trim();
+            return estado !== "si" && estado !== "no";
+        });
+    }
     if (filtroActivo === "banquete") {
         lista = lista.filter(inv => inv.tipo_invitado === "banquete");
     }
@@ -251,7 +257,7 @@ function renderTabla() {
 
         const asistenciaRaw = (inv.asistencia || "").toLowerCase().trim();
 
-        const tipo = (inv.tipo_invitado || "-").toUpperCase();
+        const tipoRaw = (inv.tipo_invitado || "").toLowerCase().trim();
         let asistencia = (inv.asistencia || "-").toUpperCase();
 
         let asistenciaClass = "";
@@ -324,7 +330,15 @@ function renderTabla() {
 
             <td>${inv.mensaje_personalizado || ""}</td>
 
-            <td>${tipo}</td>
+            <td>
+                <select
+                    class="input-tipo"
+                    onchange="editarTipo('${inv.token}', this.value)"
+                >
+                    <option value="banquete" ${tipoRaw === "banquete" ? "selected" : ""}>Banquete</option>
+                    <option value="baile" ${tipoRaw === "baile" ? "selected" : ""}>Baile</option>
+                </select>
+            </td>
 
             <td>
                 <button class="delete-btn" onclick="eliminarInvitado('${inv.token}')">
@@ -339,6 +353,30 @@ function renderTabla() {
 /* =====================
    EDITAR MESA
 ===================== */
+
+async function editarTipo(token, nuevoTipo) {
+
+    const { error } = await db
+        .from("invitaciones")
+        .update({ tipo_invitado: nuevoTipo })
+        .eq("token", token);
+
+    if (error) {
+        console.error(error);
+        showToast("Error al actualizar tipo ❌");
+        cargarDatosSafe();
+        return;
+    }
+
+    const inv = invitacionesGlobal.find(i => i.token === token);
+    if (inv) inv.tipo_invitado = nuevoTipo;
+
+    showToast(
+        nuevoTipo === "banquete"
+            ? "Tipo actualizado: Banquete 🍽️"
+            : "Tipo actualizado: Baile 💃"
+    );
+}
 
 async function editarMesa(token, nuevaMesa) {
 
@@ -872,7 +910,8 @@ window.addEventListener("load", async () => {
                 active.classList &&
                 (
                     active.classList.contains("input-mesa") ||
-                    active.classList.contains("input-detalle")
+                    active.classList.contains("input-detalle") ||
+                    active.classList.contains("input-tipo")
                 );
 
             if (!editando) {

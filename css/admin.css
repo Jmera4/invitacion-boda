@@ -617,6 +617,17 @@ td:nth-child(7) {
     text-align: center;
 }
 
+.input-tipo {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    color: var(--olive);
+    background: #fff;
+    cursor: pointer;
+    min-width: 100px;
+}
+
 .input-detalle {
     width: 100%;
     min-height: 60px;
